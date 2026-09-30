@@ -58,7 +58,7 @@ describe('App', () => {
     expect(screen.getByRole('group', { name: /game status/i })).toBeInTheDocument()
     expect(screen.getByRole('application', { name: 'Trap The Orb playing field' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Leaderboard' })).toBeInTheDocument()
-    expect(screen.getByRole('complementary', { name: 'Advertisement' })).toHaveTextContent('Your ad here')
+    expect(screen.queryByRole('complementary', { name: 'Advertisement' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /mobile apps · coming soon/i })).toBeInTheDocument()
     expect(await screen.findByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '#account')
   })
@@ -113,7 +113,7 @@ describe('App', () => {
     renderApp('/trap-the-orb#privacy')
 
     expect(await screen.findByRole('heading', { name: 'Privacy policy' })).toBeInTheDocument()
-    expect(await screen.findByText(/Effective September 24, 2026/)).toBeInTheDocument()
+    expect(await screen.findByText(/Effective September 30, 2026/)).toBeInTheDocument()
   })
 
   it('pauses a running game while a privacy dialog is open', async () => {

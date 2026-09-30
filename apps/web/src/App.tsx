@@ -6,6 +6,7 @@ import { useDocumentTitle } from '@/app/useDocumentTitle'
 import { useHashDialog } from '@/app/useHashDialog'
 import { useSectionScroll } from '@/app/useSectionScroll'
 import { SiteFooter } from '@/components/layout/SiteFooter'
+import { AnalyticsConsentBanner, AnalyticsConsentPanel } from '@/components/privacy/AnalyticsConsent'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary'
 import { Dialog } from '@/components/ui/Dialog'
@@ -14,6 +15,7 @@ import { GameScreen } from '@/games/trap-the-orb/components/GameScreen'
 import { GAME_ID } from '@/games/trap-the-orb/game'
 import { usePlayerData } from '@/games/trap-the-orb/state/playerDataContext'
 import { logger } from '@/lib/logger'
+import { useAnalytics } from '@/lib/analytics'
 
 const HowToPlayContent = lazy(() =>
   import('@/games/trap-the-orb/content/HowToPlayContent').then((m) => ({ default: m.HowToPlayContent })),
@@ -51,6 +53,7 @@ const DIALOGS: Readonly<Record<DialogId, DialogDefinition>> = {
     Content: HowToPlayContent,
   },
   privacy: { title: 'Privacy policy', isProse: true, Content: PrivacyContent },
+  'privacy-settings': { title: 'Privacy settings', description: 'Choose what optional measurement may run.', isProse: true, Content: AnalyticsConsentPanel },
   account: {
     title: 'Your account',
     description: 'Rank your scores, keep records, earn badges.',
@@ -89,6 +92,7 @@ export default function App() {
   const routeMode = route.page === 'play' ? route.mode : null
   useDocumentTitle(route)
   useSectionScroll()
+  useAnalytics()
 
   // The game opens with the last mode picked in the URL.
   useEffect(() => {
@@ -145,7 +149,9 @@ export default function App() {
           )}
         </div>
       </main>
-      <SiteFooter route={route} />
+      <SiteFooter route={route} onOpenPrivacySettings={() => open('privacy-settings')} />
+
+      <AnalyticsConsentBanner onOpenSettings={() => open('privacy-settings')} />
 
       <Dialog isOpen={dialog !== null} title={dialog?.title ?? ''} description={dialog?.description} onClose={close}>
         {dialog && (

@@ -32,6 +32,7 @@ describe('AdSlot', () => {
   })
 
   it('renders a real AdSense unit and loads the script once when configured', async () => {
+    vi.stubEnv('VITE_ADSENSE_ENABLED', 'true')
     const { container } = await renderAdSlot({ client: 'ca-pub-1234567890123456', sidebarSlot: '9876543210' })
 
     const unit = container.querySelector('ins.adsbygoogle')
@@ -42,5 +43,13 @@ describe('AdSlot', () => {
     const script = document.getElementById('adsbygoogle-js') as HTMLScriptElement | null
     expect(script?.src).toContain('client=ca-pub-1234567890123456')
     expect(document.querySelectorAll('#adsbygoogle-js')).toHaveLength(1)
+  })
+
+  it('keeps production ads off until the explicit enable gate is true', async () => {
+    vi.stubEnv('DEV', false)
+    await renderAdSlot({ client: 'ca-pub-1234567890123456', sidebarSlot: '9876543210' })
+
+    expect(document.querySelector('ins.adsbygoogle')).toBeNull()
+    expect(document.getElementById('adsbygoogle-js')).toBeNull()
   })
 })

@@ -66,7 +66,8 @@ function AdPlaceholder() {
  */
 export function AdSlot({ className = '' }: AdSlotProps) {
   const { client, sidebarSlot } = siteConfig.adsense
-  const isConfigured = client !== null && sidebarSlot !== null
+  const isConfigured =
+    import.meta.env.VITE_ADSENSE_ENABLED?.trim().toLowerCase() === 'true' && client !== null && sidebarSlot !== null
   if (!isConfigured && !import.meta.env.DEV) return null
 
   return (

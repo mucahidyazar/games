@@ -8,6 +8,12 @@ interface ImportMetaEnv {
   readonly VITE_SITE_URL?: string
   /** Contact address shown in the privacy policy. */
   readonly VITE_CONTACT_EMAIL?: string
+  /** Google Tag Manager container id (for example `GTM-ABCDE12`). */
+  readonly VITE_GTM_ID?: string
+  /** Google Analytics 4 measurement id (for example `G-ABCDE12345`). Used when GTM is unset. */
+  readonly VITE_GA_ID?: string
+  /** Set to `true` only after the publisher account and consent setup are ready. */
+  readonly VITE_ADSENSE_ENABLED?: string
   /** Google AdSense publisher id, e.g. `ca-pub-1234567890123456`. */
   readonly VITE_ADSENSE_CLIENT?: string
   /** Numeric AdSense ad unit id for the sidebar slot. */

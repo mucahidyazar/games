@@ -40,7 +40,7 @@ test('keeps the selected theme across the portal, game, dialogs and About', asyn
 
 test('has usable category empty states and restores the full library', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Browse games' }).click()
+  await page.getByRole('link', { name: 'Scroll to explore' }).click()
   await expect(page).toHaveURL('/#games')
   await expect(page.getByRole('heading', { name: 'Find your next favourite' })).toBeInViewport()
   await page.getByRole('link', { name: 'Puzzle 0', exact: true }).click()

@@ -1,7 +1,6 @@
 import { isRankedMode, type CustomSettings, type GameMode } from '@games/trap-the-orb-engine'
 import { useEffect, useEffectEvent, useRef, useSyncExternalStore, type RefObject } from 'react'
 import type { DialogId } from '@/app/navigation'
-import { AdSlot } from '@/components/ads/AdSlot'
 import { useAccount, useRefreshAfterRun } from '@/features/account/queries'
 import { AppDownloadStrip } from '@/games/trap-the-orb/apps/AppDownloadStrip'
 import type { GameController } from '../controller/GameController'
@@ -199,7 +198,6 @@ export function GameScreen({ mode, isActive, isDialogOpen, onOpenDialog }: GameS
         <div className="space-y-4 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <LeaderboardCard mode={hud.mode} />
           <TipCard level={hud.level} />
-          <AdSlot />
         </div>
 
         <div className="min-w-0 lg:col-start-1 lg:row-start-2 lg:self-start">

@@ -9,6 +9,7 @@ import { Brand } from './Brand'
 
 type SiteFooterProps = {
   readonly route: Route
+  readonly onOpenPrivacySettings: () => void
 }
 
 const TAGLINES = {
@@ -60,13 +61,13 @@ function MadeWith() {
 }
 
 /** Dark footer matching the header; the layout keeps it at the bottom of short pages. */
-export function SiteFooter({ route }: SiteFooterProps) {
+export function SiteFooter({ route, onOpenPrivacySettings }: SiteFooterProps) {
   const columns = footerColumnsFor(site, route, paths)
 
   return (
     <footer className="mt-auto shrink-0 border-t border-[var(--chrome-border)] bg-[var(--chrome-bg)] text-[var(--chrome-fg)]">
       <div className="mx-auto max-w-[1440px] px-4 pt-10 pb-8 sm:px-6 lg:px-8">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))]">
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href={paths.home()} className="inline-block rounded-lg">
               <Brand size="footer" />
@@ -96,6 +97,16 @@ export function SiteFooter({ route }: SiteFooterProps) {
               </ul>
             </nav>
           ))}
+          <div>
+            <h2 className="text-[0.66rem] font-bold tracking-[0.16em] text-[var(--chrome-muted)] uppercase">Privacy</h2>
+            <button
+              type="button"
+              onClick={onOpenPrivacySettings}
+              className="mt-3 inline-flex min-h-9 items-center rounded text-[0.84rem] text-[var(--chrome-muted)] underline-offset-4 transition hover:text-[var(--chrome-fg)] hover:underline"
+            >
+              Privacy settings
+            </button>
+          </div>
         </div>
       </div>
       <div className="border-t border-[var(--chrome-border)]">

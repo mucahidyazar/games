@@ -15,7 +15,7 @@ export function PrivacyContent({ contactEmail = siteConfig.contactEmail }: Priva
   return (
     <>
       <p>
-        <strong>Effective September 24, 2026</strong>
+        <strong>Effective September 30, 2026</strong>
       </p>
 
       <h3>Overview</h3>
@@ -68,10 +68,20 @@ export function PrivacyContent({ contactEmail = siteConfig.contactEmail }: Priva
         <li>
           <strong>Unfinished practice game</strong>: the level and score to continue from.
         </li>
+        <li><strong>Your analytics consent choice.</strong></li>
       </ul>
       <p>
         This data stays on your device and is never sent to our servers. To delete guest scores, use “Clear device
         scores” on the leaderboards page. To remove everything, clear this site’s data in your browser.
+      </p>
+
+      <h3>Optional analytics</h3>
+      <p>
+        Google Analytics, loaded through Google Tag Manager, stays off until you allow analytics. Our page-view
+        events contain the page path and origin, without query strings, fragments or the referring URL. We do not
+        send form values, email addresses, account details or game replay data to analytics. Google also receives
+        technical request information and may use analytics cookies and device identifiers; this is not anonymous
+        processing. You can refuse or withdraw analytics through “Privacy settings” in the footer.
       </p>
 
       <h3>Advertising</h3>
@@ -92,8 +102,9 @@ export function PrivacyContent({ contactEmail = siteConfig.contactEmail }: Priva
         .
       </p>
       <p>
-        If you visit from the European Economic Area, the United Kingdom or Switzerland, we ask for your consent through
-        a Google-certified consent management platform.
+        Advertising is disabled until the AdSense account, site approval and consent management are configured.
+        Before enabling ads for visitors from the European Economic Area, the United Kingdom or Switzerland, we must
+        configure a Google-certified consent management platform. Our analytics preference panel is not that platform.
       </p>
 
       <h3>Server logs and security</h3>

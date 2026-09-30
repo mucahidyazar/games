@@ -105,3 +105,27 @@ The simplest setup is one container that serves both the site and the API from t
 The API needs to reach Postgres. The database in `DATABASE_URL` can be on a LAN only if the API runs on that network; otherwise use a VPN, a tunnel or a managed database, with `sslmode=require` when the connection leaves a trusted network. Migrations are applied automatically when the API starts (`DB_MIGRATE=off` turns that off; `pnpm --filter api db:migrate` runs them by hand).
 
 The site alone can still be hosted on a static host (`apps/web/vercel.json` and `public/_headers` carry the security headers), but then `/api` must be routed to the API on the same site for sign-in to work.
+
+### Coolify with an existing Cloudflare Tunnel
+
+Use the root Dockerfile, context `/`, exposed port `3102`, and `VITE_SITE=portal` / `VITE_SITE_URL=https://games.mucahid.dev`. Public `VITE_*` values must be available at **build time**; changing them needs a rebuild. Database/auth/email secrets belong only in runtime variables. Keep production login-code logging disabled.
+
+For a tunnel connector on the same server, map a free loopback port (for example `127.0.0.1:10105:3102`) and route `games.mucahid.dev` to `http://127.0.0.1:10105`. The public-hostname configuration creates tunnel DNS; avoid conflicting A records. Preserve the existing tunnel and its other applications. Postgres holds accounts and ranked runs, so maintain database backups independently.
+
+If the connector runs on another LAN machine, bind the origin port to the Coolify server's LAN IP rather than loopback and use that IP in the service URL. Do not expose the origin port to the public Internet.
+
+### Optional analytics and advertising
+
+`VITE_GTM_ID` selects a GTM Web container; `VITE_GA_ID` is a direct GA4 fallback only when GTM is unset. Neither integration loads until the visitor allows analytics. “Privacy settings” in the footer can reopen or withdraw the choice. Events use only the origin/path, remove query strings/fragments and clear the referrer. They never include email addresses, profiles, form values or replay data. Google may still process technical request information and cookies/device identifiers after consent.
+
+In GTM, use a `site_page_view` custom-event trigger and v2 data-layer variables for `page_path`, `page_location` and `page_referrer`. Use a native Google tag with `send_page_view=false` and a native GA4 `page_view` event using those fields. Fire the Google tag once per page before the event. Disable GA4 Enhanced Measurement and do not add automatic history/form/search triggers. Use native tags: the production CSP does not permit arbitrary inline Custom HTML.
+
+Ads are disabled by default (`VITE_ADSENSE_ENABLED=false`). Obtain publisher/slot IDs from AdSense, finish account/site approval, domain-level ads.txt verification and the required Google-certified CMP before enabling ads; the analytics panel is not that CMP. Ads are kept outside the playable game surface to reduce accidental clicks. `/ads.txt` is generated from the publisher ID while ad serving is disabled, allowing ownership verification before launch. Do not click your own ads to test.
+
+## Contributing
+
+Focused issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md) and [GitHub Issues](https://github.com/mucahidyazar/games/issues). Do not publish credentials, private logs or personal account details.
+
+## License
+
+The repository is public, but the owner has not yet selected a reuse license. Until a LICENSE file is added, public visibility does not grant an open-source license.

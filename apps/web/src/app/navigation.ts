@@ -3,7 +3,7 @@ import type { SitePaths } from '@/sites/paths'
 import { routeGame, type Route } from '@/sites/routes'
 import type { Site } from '@/sites/sites'
 
-export const DIALOG_IDS = ['how-to-play', 'privacy', 'account'] as const
+export const DIALOG_IDS = ['how-to-play', 'privacy', 'privacy-settings', 'account'] as const
 
 export type DialogId = (typeof DIALOG_IDS)[number]
 
