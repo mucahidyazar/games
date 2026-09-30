@@ -1,0 +1,514 @@
+@import '@fontsource-variable/plus-jakarta-sans/wght.css';
+@import 'tailwindcss';
+
+/*
+ * Shared design tokens for the portal and its games.
+ * Canvas colours (field, walls, orbs) live here too so the renderer and the
+ * DOM share one source of truth.
+ */
+@theme {
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-page: #f9fafc;
+  --color-surface: #ffffff;
+  --color-sunken: #f2f5f9;
+  --color-line: #e9eef4;
+  --color-line-strong: #e2e9f0;
+  --color-divider: #eef2f6;
+  --color-action: #0f2548;
+  --color-on-action: #ffffff;
+  --chrome-bg: var(--color-page);
+  --chrome-fg: var(--color-ink);
+  --chrome-muted: var(--color-muted);
+  --chrome-border: var(--color-line);
+
+  --color-ink: #0f2548;
+  --color-ink-soft: #3a4b6e;
+  --color-nav: #465779;
+  --color-muted: #5b6b86;
+  --color-subtle: #627189;
+  --color-icon: #627898;
+
+  --color-teal-50: #f0f9f9;
+  --color-teal-100: #e8f6f5;
+  --color-teal-150: #dcf1f0;
+  --color-teal-200: #d1f0ee;
+  --color-teal-300: #7fd9d0;
+  --color-teal-400: #2ec4bc;
+  --color-teal-500: #0bb3a8;
+  --color-teal-600: #087f79;
+  --color-teal-700: #077f85;
+  --color-teal-800: #06646a;
+
+  --color-coral-400: #f87e7c;
+  --color-coral-500: #ed6461;
+  /* 600+ carry white text: #d2423d is 4.6:1 against white (WCAG AA). */
+  --color-coral-600: #d2423d;
+  --color-coral-700: #b93532;
+  --color-danger: #b93532;
+  --color-accent: #087f85;
+  --color-reward: #846008;
+  --color-purple: #754acb;
+
+  --color-gold: #fedb85;
+  --color-silver: #d9dee8;
+  --color-bronze: #ec9460;
+  --color-heart: #ed3b37;
+
+  --color-field: #ffffff;
+  --color-captured: #dcf1f0;
+  --color-wall: #a0b6c6;
+  --color-building: #0bb5a9;
+  --color-anchor: #0aa39a;
+
+  --radius-card: 12px;
+  --radius-control: 9px;
+
+  --shadow-card: 0 1px 2px rgb(15 37 72 / 0.04), 0 6px 18px -12px rgb(15 37 72 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(15 37 72 / 0.05), 0 16px 32px -12px rgb(15 37 72 / 0.18);
+  --shadow-coral: 0 8px 18px -10px rgb(210 66 61 / 0.55);
+
+  --color-night: #0b1630;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c4ddc;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-rise: rise 420ms var(--ease-out-expo) both;
+  --animate-pop: pop 320ms var(--ease-out-expo) both;
+  --animate-heartbeat: heartbeat 1.8s ease-in-out infinite;
+  --animate-drift: drift 22s ease-in-out infinite alternate;
+  --animate-drift-slow: drift 34s ease-in-out infinite alternate-reverse;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes heartbeat {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    12% {
+      transform: scale(1.22);
+    }
+    24% {
+      transform: scale(1);
+    }
+    36% {
+      transform: scale(1.14);
+    }
+    50% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes drift {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(60px, -40px, 0);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* Semantic tokens are shared by the portal, game, forms, dialogs and canvas.
+   No route-specific overrides: a selected theme covers the entire site. */
+:root:not([data-theme='light']) {
+  color-scheme: dark;
+  --color-page: #0b1630;
+  --color-surface: #13233e;
+  --color-sunken: #192d49;
+  --color-line: #2a3b56;
+  --color-line-strong: #405672;
+  --color-divider: #263a57;
+  --color-ink: #f3f6fc;
+  --color-ink-soft: #d7e1ef;
+  --color-nav: #b8c9dd;
+  --color-muted: #b0bfd4;
+  --color-subtle: #9aacc5;
+  --color-icon: #a6b9d1;
+  --color-action: #b2f2dd;
+  --color-on-action: #123a37;
+  --color-teal-50: #132f3e;
+  --color-teal-100: #193b48;
+  --color-teal-150: #204854;
+  --color-teal-200: #285e65;
+  --color-teal-700: #7ee1d0;
+  --color-teal-800: #b0f0e1;
+  --color-danger: #ff9c9a;
+  --color-accent: #7fd9d0;
+  --color-reward: #fedb85;
+  --color-purple: #c4b5fd;
+  --chrome-bg: #0b1630;
+  --chrome-fg: #ffffff;
+  --chrome-muted: rgb(255 255 255 / 0.68);
+  --chrome-border: rgb(255 255 255 / 0.1);
+  --color-field: #0e1c33;
+  --color-captured: #1b4852;
+  --color-wall: #6c8ca5;
+  --color-building: #53dac7;
+  --color-anchor: #a0eee0;
+  --shadow-card: 0 2px 12px rgb(0 0 0 / 0.12);
+  --shadow-lift: 0 16px 42px rgb(0 0 0 / 0.3);
+}
+
+:root[data-theme='light'] { color-scheme: light; }
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    /* viewport-fit=cover lets the page reach under notches; keep content clear of them. */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #root { min-height: 100%; }
+
+  dialog::backdrop { background: rgb(11 22 48 / 0.64); }
+
+  :focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-teal-500) 55%, transparent);
+    outline-offset: 2px;
+  }
+
+  button,
+  [role='button'] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  kbd {
+    font-family: inherit;
+  }
+}
+
+@layer components {
+  .hero-gradient { background-image: linear-gradient(110deg, var(--color-accent), var(--color-purple), var(--color-danger)); }
+
+  /* The portal hero is an image-led stage: the header floats above it and the
+     geometry gives the single featured game a sense of depth without hiding
+     the card's controls. */
+  .portal-hero-image {
+    filter: saturate(0.92) contrast(1.04);
+    transform: scale(1.02);
+    animation: portal-hero-breathe 18s ease-in-out infinite alternate;
+  }
+  .portal-hero-shade {
+    background:
+      linear-gradient(180deg, rgb(5 13 30 / 0.5) 0%, rgb(7 18 37 / 0.12) 35%, rgb(7 18 37 / 0.82) 100%),
+      radial-gradient(ellipse at center, transparent 22%, rgb(4 12 28 / 0.34) 78%);
+  }
+  .portal-hero-grid {
+    opacity: 0.2;
+    background-image: linear-gradient(rgb(151 198 255 / 0.12) 1px, transparent 1px), linear-gradient(90deg, rgb(151 198 255 / 0.12) 1px, transparent 1px);
+    background-size: 84px 84px;
+    mask-image: linear-gradient(180deg, transparent 4%, black 42%, transparent 92%);
+    transform: perspective(600px) rotateX(58deg) scale(1.7) translateY(18%);
+    transform-origin: center bottom;
+  }
+  .portal-hero-orbit-stage {
+    position: relative;
+    display: grid;
+    min-height: 330px;
+    width: 100%;
+    place-items: center;
+  }
+  .portal-hero-featured.animate-float {
+    /* Keep the interactive card stable; ambient stars and the image provide
+       the motion around it. */
+    animation: none !important;
+  }
+  .portal-hero-orbit-stage.is-orbiting {
+    min-height: 360px;
+  }
+  .portal-hero-game-item {
+    width: 100%;
+  }
+  .portal-hero-orbit-stage.is-orbiting .portal-hero-game-item {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    width: min(310px, 72vw);
+    margin: auto;
+    place-items: center;
+    animation: portal-card-orbit 24s linear infinite;
+    animation-delay: var(--orbit-delay, 0s);
+    transform-origin: center;
+  }
+  .portal-hero-orbit-stage.is-orbiting .portal-hero-game-item > a {
+    width: 100%;
+  }
+  .portal-hero-stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .portal-hero-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 0 10px 2px rgb(173 232 255 / 0.75);
+    opacity: 0;
+    animation: portal-star-drift var(--star-duration, 12s) ease-in-out var(--star-delay, 0s) infinite;
+  }
+  .portal-hero-orbit {
+    position: absolute;
+    pointer-events: none;
+    border: 1px solid rgb(127 217 208 / 0.28);
+    border-radius: 999px;
+    animation: portal-hero-orbit 20s linear infinite;
+  }
+  .portal-hero-orbit-one {
+    width: min(58vw, 760px);
+    height: min(18vw, 240px);
+    right: -8%;
+    bottom: 14%;
+    transform: rotate(-16deg);
+  }
+  .portal-hero-orbit-two {
+    width: min(48vw, 620px);
+    height: min(15vw, 190px);
+    left: -13%;
+    bottom: 25%;
+    border-color: rgb(196 181 253 / 0.25);
+    animation-direction: reverse;
+    animation-duration: 26s;
+  }
+  .portal-hero-spark {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: #b2f2dd;
+    box-shadow: 0 0 18px 5px rgb(127 217 208 / 0.58);
+    animation: portal-hero-spark 7s ease-in-out infinite;
+  }
+  .portal-hero-spark-one { top: 31%; left: 18%; }
+  .portal-hero-spark-two { right: 20%; bottom: 26%; animation-delay: -3s; background: #c4b5fd; box-shadow: 0 0 18px 5px rgb(196 181 253 / 0.6); }
+
+  @keyframes portal-hero-breathe {
+    from { transform: scale(1.02) translate3d(-0.5%, 0, 0); }
+    to { transform: scale(1.07) translate3d(0.5%, -0.5%, 0); }
+  }
+  @keyframes portal-hero-orbit {
+    from { transform: rotate(-16deg) translateX(-2%); }
+    to { transform: rotate(-16deg) translateX(2%); }
+  }
+  @keyframes portal-hero-spark {
+    0%, 100% { opacity: 0.28; transform: translate3d(0, 8px, 0) scale(0.75); }
+    50% { opacity: 1; transform: translate3d(12px, -12px, 0) scale(1.2); }
+  }
+  @keyframes portal-star-drift {
+    0% { opacity: 0; transform: translate3d(-24px, 18px, 0) scale(0.5); }
+    18% { opacity: 0.85; }
+    62% { opacity: 0.42; }
+    100% { opacity: 0; transform: translate3d(180px, -58px, 0) scale(1.15); }
+  }
+  @keyframes portal-card-orbit {
+    from { transform: rotate(var(--orbit-angle, 0deg)) translateX(clamp(150px, 18vw, 220px)) rotate(calc(-1 * var(--orbit-angle, 0deg))); }
+    to { transform: rotate(calc(var(--orbit-angle, 0deg) + 360deg)) translateX(clamp(150px, 18vw, 220px)) rotate(calc(-1 * (var(--orbit-angle, 0deg) + 360deg))); }
+  }
+  .daily-card { display: flex; height: 100%; min-height: 300px; flex-direction: column; border: 1px solid var(--color-line); border-radius: 18px; padding: 24px; background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--color-reward) 9%, transparent), transparent 70%), var(--color-surface); transition: border-color 200ms; }
+  .daily-card:hover { border-color: var(--color-reward); }
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Range slider: light rail, teal fill up to --fill (set inline), white thumb. */
+  .range {
+    --fill: 50%;
+    appearance: none;
+    height: 6px;
+    width: 100%;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--color-teal-500) var(--fill), var(--color-line-strong) var(--fill));
+    cursor: pointer;
+  }
+  .range::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-teal-600);
+    box-shadow: 0 1px 3px rgb(15 37 72 / 0.22);
+    transition: transform var(--duration-fast, 150ms) ease-out;
+  }
+  .range::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-teal-600);
+    box-shadow: 0 1px 3px rgb(15 37 72 / 0.22);
+    transition: transform var(--duration-fast, 150ms) ease-out;
+  }
+  .range:hover::-webkit-slider-thumb,
+  .range:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+  .range:hover::-moz-range-thumb,
+  .range:active::-moz-range-thumb {
+    transform: scale(1.15);
+  }
+  .range:focus-visible {
+    outline-offset: 5px;
+  }
+  .range:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+  }
+  .range:disabled::-webkit-slider-thumb {
+    transform: none;
+  }
+
+  /* Long-form copy on the About page and inside dialogs. */
+  .prose-dialog {
+    color: var(--color-muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  .prose-dialog > * + * {
+    margin-top: 0.85em;
+  }
+  .prose-dialog h2,
+  .prose-dialog h3 {
+    margin-top: 1.5em;
+    color: var(--color-ink);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .prose-dialog h2:first-child,
+  .prose-dialog h3:first-child {
+    margin-top: 0;
+  }
+  .prose-dialog strong {
+    color: var(--color-ink);
+    font-weight: 650;
+  }
+  .prose-dialog a {
+    color: var(--color-teal-700);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+  }
+  .prose-dialog ul,
+  .prose-dialog ol {
+    padding-left: 1.2em;
+  }
+  .prose-dialog ul {
+    list-style: disc;
+  }
+  .prose-dialog ol {
+    list-style: decimal;
+  }
+  .prose-dialog li + li {
+    margin-top: 0.35em;
+  }
+  .prose-dialog li::marker {
+    color: var(--color-teal-500);
+  }
+  .prose-dialog kbd {
+    display: inline-block;
+    min-width: 1.6em;
+    padding: 0.05em 0.45em;
+    border: 1px solid var(--color-line-strong);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    background: var(--color-sunken);
+    color: var(--color-ink);
+    font-size: 0.82em;
+    font-weight: 650;
+    text-align: center;
+  }
+  .prose-dialog table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+  }
+  .prose-dialog th,
+  .prose-dialog td {
+    padding: 0.5em 0.6em;
+    border-bottom: 1px solid var(--color-divider);
+    text-align: left;
+    vertical-align: top;
+  }
+  .prose-dialog th {
+    color: var(--color-ink);
+    font-weight: 650;
+  }
+  .prose-dialog dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.45em 1em;
+  }
+  .prose-dialog dt {
+    color: var(--color-ink);
+    font-weight: 650;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ca38381c90a14bd19f11d93364573a1, type: 3}
+  m_Name: AppAssets
+  m_EditorClassIdentifier: TrapTheOrb.App::TrapTheOrb.App.Bootstrap.AppAssets
+  styleSheets:
+  - {fileID: 7433441132597879392, guid: 5c3ea3ecb82e343afa181eebfe167841, type: 3}
+  - {fileID: 7433441132597879392, guid: e202eb6fcbbda4603b6d7fcef12f5054, type: 3}
+  - {fileID: 7433441132597879392, guid: 0058ec0c98022475eacf902991fc8f65, type: 3}
+  - {fileID: 7433441132597879392, guid: 3948082fd739f4fe99362c16b37bfdc6, type: 3}
+  - {fileID: 7433441132597879392, guid: 60da970d3691e4f71876bb9ce98dfcbf, type: 3}
+  orbTextures:
+  - {fileID: 2800000, guid: 42e6aa1f293004b0ea8de960eb30763d, type: 3}
+  - {fileID: 2800000, guid: 836de117cc04742ad90a5a611ef4382b, type: 3}
+  - {fileID: 2800000, guid: 234b71ca9933a4ea1be8a0c325a27855, type: 3}
+  - {fileID: 2800000, guid: cceb12758a16b44c09f3d7f5b91eba21, type: 3}
+  sounds:
+  - {fileID: 8300000, guid: 6e31c0acec4114b569ad6794243779cc, type: 3}
+  - {fileID: 8300000, guid: 2dab9356f25754d06ab4f34a87c56efe, type: 3}
+  - {fileID: 8300000, guid: 02b3f5d71e0cd4d01b5cfe726a70629e, type: 3}
+  - {fileID: 8300000, guid: 5a03af230ccea49dba620a8ef85eb48b, type: 3}
+  - {fileID: 8300000, guid: c160a311e5df64564b0f106d2e6ed966, type: 3}
+  - {fileID: 8300000, guid: 2ceeb34b3b10a4af0a2038c19c09d0d0, type: 3}
+  - {fileID: 8300000, guid: 254409755278f4691a202a7a30f37407, type: 3}
+  - {fileID: 8300000, guid: a55359089b8e04d9f98a926d64c2e844, type: 3}

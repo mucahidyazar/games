@@ -1,0 +1,21 @@
+{
+    "name": "TrapTheOrb.Editor",
+    "rootNamespace": "TrapTheOrb.EditorTools",
+    "references": [
+        "TrapTheOrb.App",
+        "TrapTheOrb.Engine",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,89 @@
+/*
+ * Design tokens of the web game (apps/web/src/index.css). Navy dark is the default theme;
+ * the root gets .theme-navy or .theme-light. Colours with alpha are spelled out, because
+ * USS cannot mix a variable with an opacity.
+ */
+
+.app {
+    --font-400: url("../Fonts/PlusJakartaSans-Regular-SDF.asset");
+    --font-500: url("../Fonts/PlusJakartaSans-Medium-SDF.asset");
+    --font-600: url("../Fonts/PlusJakartaSans-SemiBold-SDF.asset");
+    --font-700: url("../Fonts/PlusJakartaSans-Bold-SDF.asset");
+    --font-800: url("../Fonts/PlusJakartaSans-ExtraBold-SDF.asset");
+
+    --color-teal-300: #7fd9d0;
+    --color-teal-400: #2ec4bc;
+    --color-teal-500: #0bb3a8;
+    --color-teal-600: #087f79;
+    --color-coral-400: #f87e7c;
+    --color-coral-500: #ed6461;
+    --color-coral-600: #d2423d;
+    --color-coral-700: #b93532;
+    --color-gold: #fedb85;
+    --color-silver: #d9dee8;
+    --color-bronze: #ec9460;
+    --color-star: #f5b83d;
+    --dialog-backdrop: rgba(11, 22, 48, 0.64);
+}
+
+.theme-light {
+    --color-page: #f9fafc;
+    --color-page-60: rgba(249, 250, 252, 0.6);
+    --color-surface: #ffffff;
+    --color-sunken: #f2f5f9;
+    --color-line: #e9eef4;
+    --color-line-strong: #e2e9f0;
+    --color-divider: #eef2f6;
+    --color-action: #0f2548;
+    --color-on-action: #ffffff;
+    --color-ink: #0f2548;
+    --color-ink-soft: #3a4b6e;
+    --color-muted: #5b6b86;
+    --color-subtle: #627189;
+    --color-icon: #627898;
+    --color-teal-50: #f0f9f9;
+    --color-teal-100: #e8f6f5;
+    --color-teal-150: #dcf1f0;
+    --color-teal-200: #d1f0ee;
+    --color-teal-700: #077f85;
+    --color-teal-800: #06646a;
+    --color-danger: #b93532;
+    --color-danger-soft: rgba(248, 126, 124, 0.1);
+    --color-ranked: rgba(248, 126, 124, 0.15);
+    --color-accent: #087f85;
+    --chrome-bg: #f9fafc;
+    --chrome-fg: #0f2548;
+    --chrome-muted: #5b6b86;
+    --chrome-border: #e9eef4;
+}
+
+.theme-navy {
+    --color-page: #0b1630;
+    --color-page-60: rgba(11, 22, 48, 0.6);
+    --color-surface: #13233e;
+    --color-sunken: #192d49;
+    --color-line: #2a3b56;
+    --color-line-strong: #405672;
+    --color-divider: #263a57;
+    --color-action: #b2f2dd;
+    --color-on-action: #123a37;
+    --color-ink: #f3f6fc;
+    --color-ink-soft: #d7e1ef;
+    --color-muted: #b0bfd4;
+    --color-subtle: #9aacc5;
+    --color-icon: #a6b9d1;
+    --color-teal-50: #132f3e;
+    --color-teal-100: #193b48;
+    --color-teal-150: #204854;
+    --color-teal-200: #285e65;
+    --color-teal-700: #7ee1d0;
+    --color-teal-800: #b0f0e1;
+    --color-danger: #ff9c9a;
+    --color-danger-soft: rgba(248, 126, 124, 0.1);
+    --color-ranked: rgba(248, 126, 124, 0.15);
+    --color-accent: #7fd9d0;
+    --chrome-bg: #0b1630;
+    --chrome-fg: #ffffff;
+    --chrome-muted: rgba(255, 255, 255, 0.68);
+    --chrome-border: rgba(255, 255, 255, 0.1);
+}

@@ -1,0 +1,26 @@
+{
+  "name": "games",
+  "private": true,
+  "type": "module",
+  "description": "Mucahid's browser games: Trap The Orb and the shared API.",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm -r build",
+    "start": "pnpm --filter api start",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "oxlint",
+    "test": "pnpm -r test",
+    "test:coverage": "pnpm -r test:coverage",
+    "e2e": "pnpm --filter web e2e",
+    "e2e:visual": "pnpm --filter web e2e:visual",
+    "e2e:update-visual": "pnpm --filter web e2e:update-visual"
+  },
+  "devDependencies": {
+    "oxlint": "^1.81.0",
+    "typescript": "~6.0.2"
+  },
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=20.19"
+  }
+}

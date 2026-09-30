@@ -1,0 +1,10 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'dev.mucahid.traptheorb.nativeplugin'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 26
+    }
+}

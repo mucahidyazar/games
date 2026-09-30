@@ -1,0 +1,15 @@
+# Security headers for Netlify and Cloudflare Pages. Keep in sync with vercel.json.
+# Scripts: no inline code and no eval. External HTTPS scripts are allowed because Google AdSense
+# loads from many regional Google domains (e.g. adservice.google.com.tr) that an allowlist would break.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-src https:; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  X-Frame-Options: DENY
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+
+# Vite puts content-hashed files in /assets, so they can be cached forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -1,0 +1,8 @@
+{
+  "env": {
+    "UNITY_MCP_HTTP_PORT": "8642"
+  },
+  "enabledPlugins": {
+    "unity@claude-plugins-official": true
+  }
+}

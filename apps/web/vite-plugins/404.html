@@ -1,0 +1,372 @@
+<!doctype html>
+<!--
+  Branded "page not found" page. Vercel, Netlify, Cloudflare Pages and GitHub Pages serve
+  /404.html (with a 404 status) for unknown paths.
+  - It can be served at any depth (/a/b/c), so every URL here is absolute.
+  - The production CSP blocks inline scripts; the shared external theme initializer is allowed.
+    Inline <style> is fine: the CSP allows style-src 'unsafe-inline'.
+  - vite-plugins/seoFiles.ts fills the selected site branding at build time.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>%NOT_FOUND_TITLE%</title>
+    <meta name="description" content="%NOT_FOUND_DESCRIPTION%" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="%SITE_THEME_COLOR%" />
+    <meta name="color-scheme" content="light dark" />
+    <script src="/theme-init.js"></script>
+    <link rel="icon" type="image/svg+xml" href="%SITE_FAVICON%" />
+    <link rel="icon" type="image/png" sizes="192x192" href="%SITE_ICON%" />
+    <style>
+      :root {
+        color-scheme: light;
+
+        --color-page: #f9fafc;
+        --color-surface: #ffffff;
+        --color-ink: #0f2548;
+        --color-ink-soft: #3a4b6e;
+        --color-line: #e2e9f0;
+        --color-divider: #eef2f6;
+        --color-captured: #dcf1f0;
+        --color-teal: #0aa39a;
+        /* #0aa39a is only 3:1, so small teal text uses the darker shade (4.6:1 on the page colour). */
+        --color-teal-text: #077f85;
+        /* White on #d2423d is 4.6:1 (WCAG AA). */
+        --color-coral: #d2423d;
+        --color-coral-hover: #b93532;
+
+        --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+        --text-eyebrow: 0.75rem;
+        --text-lede: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+        --text-title: clamp(2.125rem, 1.5rem + 3.2vw, 3.5rem);
+
+        --space-gutter: 16px;
+        --header-height: 56px;
+        --content-max: 1440px;
+
+        --radius-board: 20px;
+        --radius-button: 14px;
+
+        --shadow-lift: 0 2px 4px rgb(15 37 72 / 0.05), 0 18px 36px -14px rgb(15 37 72 / 0.2);
+        --shadow-coral: 0 10px 22px -12px rgb(210 66 61 / 0.6);
+        --shadow-coral-hover: 0 16px 28px -12px rgb(210 66 61 / 0.7);
+        --focus-ring: 3px solid rgb(11 179 168 / 0.55);
+
+        --duration-fast: 200ms;
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* Keep the static fallback on the same two-token theme system as the app.
+         theme-init.js sets data-theme before this stylesheet paints. */
+      :root:not([data-theme='light']) {
+        color-scheme: dark;
+        --color-page: #0b1630;
+        --color-surface: #13233e;
+        --color-ink: #f6f8fc;
+        --color-ink-soft: #d7e1ef;
+        --color-line: #2a3b56;
+        --color-divider: #263a57;
+        --color-captured: #16394a;
+        --color-teal-text: #7fd9d0;
+        --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.2), 0 18px 36px -14px rgb(0 0 0 / 0.45);
+      }
+
+      :root[data-theme='light'] {
+        color-scheme: light;
+      }
+
+      @media (min-width: 640px) {
+        :root {
+          --space-gutter: 24px;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        :root {
+          --space-gutter: 32px;
+          --header-height: 64px;
+        }
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        min-height: 100svh;
+        margin: 0;
+        /* viewport-fit=cover reaches under notches; keep the content clear of them. */
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+          env(safe-area-inset-left);
+        background: var(--color-page);
+        color: var(--color-ink);
+        font-family: var(--font-sans);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Mirrors the game's header, so the brand sits where players expect it. */
+      .site-header {
+        display: flex;
+        align-items: center;
+        height: var(--header-height);
+        padding-inline: max(var(--space-gutter), calc(50% - var(--content-max) / 2 + var(--space-gutter)));
+        border-bottom: 1px solid var(--color-divider);
+        background: var(--color-surface);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 8px;
+        color: var(--color-ink);
+        /* 19px+ extra-bold counts as large text, so the teal "Orb" (3.1:1 on white) meets WCAG AA. */
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .brand-mark {
+        flex: none;
+        width: 30px;
+        height: 30px;
+      }
+
+      .brand-accent {
+        color: var(--color-teal);
+      }
+
+      .stage {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(40px, 8vh, 96px) var(--space-gutter) clamp(48px, 10vh, 112px);
+        text-align: center;
+      }
+
+      /* A tiny game board: the captured field, one walled-in pocket and the orb that got trapped. */
+      .board {
+        width: min(100%, 420px);
+        margin-bottom: clamp(28px, 5vh, 44px);
+        padding: 8px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-board);
+        background: var(--color-surface);
+        box-shadow: var(--shadow-lift);
+        transform: rotate(-2deg);
+      }
+
+      .board svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .board-digit {
+        fill: var(--color-ink);
+        font-family: var(--font-sans);
+        font-size: 116px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--color-teal-text);
+        font-size: var(--text-eyebrow);
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 14ch;
+        margin: 12px 0 0;
+        font-size: var(--text-title);
+        font-weight: 800;
+        line-height: 1.04;
+        letter-spacing: -0.035em;
+        text-wrap: balance;
+      }
+
+      .lede {
+        max-width: 38ch;
+        margin: 16px 0 0;
+        color: var(--color-ink-soft);
+        font-size: var(--text-lede);
+        line-height: 1.6;
+        text-wrap: balance;
+      }
+
+      .play {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 56px;
+        margin-top: 32px;
+        padding: 0 32px;
+        /* Transparent until forced-colors mode, where it keeps the button outlined. */
+        border: 2px solid transparent;
+        border-radius: var(--radius-button);
+        background: var(--color-coral);
+        box-shadow: var(--shadow-coral);
+        color: #ffffff;
+        font-size: 1.125rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        transition:
+          transform var(--duration-fast) var(--ease-out-expo),
+          background-color var(--duration-fast) var(--ease-out-expo),
+          box-shadow var(--duration-fast) var(--ease-out-expo);
+      }
+
+      .play:hover {
+        background: var(--color-coral-hover);
+        box-shadow: var(--shadow-coral-hover);
+        transform: translateY(-2px);
+      }
+
+      .play:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .play-icon {
+        flex: none;
+        width: 20px;
+        height: 20px;
+      }
+
+      .brand:focus-visible,
+      .play:focus-visible {
+        outline: var(--focus-ring);
+        outline-offset: 3px;
+      }
+
+      /* The orb ricochets around its pocket: two linear back-and-forth moves make a billiard path. */
+      @media (prefers-reduced-motion: no-preference) {
+        .orb-x {
+          animation: orb-x 1s linear infinite alternate;
+        }
+
+        .orb-y {
+          animation: orb-y 1.3s linear infinite alternate;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .play,
+        .play:hover,
+        .play:active {
+          transform: none;
+          transition: none;
+        }
+      }
+
+      @keyframes orb-x {
+        from {
+          transform: translateX(-16px);
+        }
+        to {
+          transform: translateX(16px);
+        }
+      }
+
+      @keyframes orb-y {
+        from {
+          transform: translateY(-22px);
+        }
+        to {
+          transform: translateY(22px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="logo-field" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#16c7ba" />
+              <stop offset="1" stop-color="#079c91" />
+            </linearGradient>
+            <radialGradient id="logo-orb" cx="0.36" cy="0.32" r="0.78">
+              <stop offset="0" stop-color="#ffdcaa" />
+              <stop offset="0.45" stop-color="#ff8c1a" />
+              <stop offset="1" stop-color="#dd5a00" />
+            </radialGradient>
+          </defs>
+          <rect x="1" y="1" width="38" height="38" rx="11" fill="url(#logo-field)" />
+          <path d="M26.2 7H30a3 3 0 0 1 3 3v20a3 3 0 0 1-3 3h-3.8Z" fill="#fff" fill-opacity="0.3" />
+          <rect x="22.8" y="7" width="3.4" height="26" rx="1.7" fill="#fff" />
+          <circle cx="13.6" cy="20" r="6.6" fill="url(#logo-orb)" />
+          <ellipse cx="11.5" cy="17.6" rx="2.1" ry="1.35" transform="rotate(-35 11.5 17.6)" fill="#fff" fill-opacity="0.85" />
+        </svg>
+        <span>%SITE_NAME%</span>
+      </a>
+    </header>
+
+    <main class="stage">
+      <div class="board" aria-hidden="true">
+        <svg viewBox="0 0 360 180" focusable="false">
+          <defs>
+            <clipPath id="board-field">
+              <rect width="360" height="180" rx="13" />
+            </clipPath>
+            <radialGradient id="board-orb" cx="0.36" cy="0.32" r="0.78">
+              <stop offset="0" stop-color="#ffdcaa" />
+              <stop offset="0.45" stop-color="#ff8c1a" />
+              <stop offset="1" stop-color="#dd5a00" />
+            </radialGradient>
+          </defs>
+          <rect width="360" height="180" fill="var(--color-captured)" clip-path="url(#board-field)" />
+          <text class="board-digit" x="67" y="132" text-anchor="middle">4</text>
+          <text class="board-digit" x="293" y="132" text-anchor="middle">4</text>
+          <rect x="136" y="40" width="88" height="100" rx="4" fill="var(--color-surface)" stroke="#0aa39a" stroke-width="4" />
+          <g class="orb-x">
+            <g class="orb-y">
+              <circle cx="180" cy="90" r="26" fill="url(#board-orb)" />
+              <ellipse cx="171.5" cy="80.5" rx="8.3" ry="5.3" transform="rotate(-35 171.5 80.5)" fill="#fff" fill-opacity="0.85" />
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <p class="eyebrow">Error 404 · Page not found</p>
+      <h1>%NOT_FOUND_HEADLINE%</h1>
+      <p class="lede">
+        %NOT_FOUND_BODY%
+      </p>
+      <a class="play" href="%NOT_FOUND_CTA_HREF%">
+        <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path
+            d="M7.5 4.8v14.4a1.3 1.3 0 0 0 2 1.1l11.2-7.2a1.3 1.3 0 0 0 0-2.2L9.5 3.7a1.3 1.3 0 0 0-2 1.1Z"
+            fill="currentColor"
+          />
+        </svg>
+        %NOT_FOUND_CTA%
+      </a>
+    </main>
+  </body>
+</html>

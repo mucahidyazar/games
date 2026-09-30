@@ -1,0 +1,26 @@
+# Built inside the image
+**/node_modules
+**/dist
+**/dist-ssr
+
+# Secrets: never send real environment files to the Docker daemon
+.env
+.env.*
+!.env.example
+**/*.local
+
+# Local data, test output and tooling
+**/.data
+**/coverage
+**/test-results
+**/playwright-report
+**/*.log
+**/*.tsbuildinfo
+.git
+.vscode
+.idea
+.DS_Store
+
+# Unity projects and generated 3D assets are never part of the image
+unity
+meshy_output

@@ -1,0 +1,40 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Test output
+coverage
+test-results
+playwright-report
+
+# Secrets: never commit real environment files (.env.example is the template)
+.env
+.env.*
+!.env.example
+
+# API development database (PGlite, used when DATABASE_URL is empty)
+apps/api/.data/
+
+# Meshy downloads that were not saved straight into a Unity project
+meshy_output/

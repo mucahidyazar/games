@@ -1,0 +1,35 @@
+{
+  "id": "/",
+  "name": "Trap The Orb",
+  "short_name": "Trap The Orb",
+  "description": "Trap the orbs. Claim the space. Build walls, box in the bouncing orbs and capture the field. Free to play in your browser, no sign-up.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f9fafc",
+  "theme_color": "#0f2548",
+  "categories": ["games"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
