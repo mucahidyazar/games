@@ -120,7 +120,7 @@ If the connector runs on another LAN machine, bind the origin port to the Coolif
 
 In GTM, use a `site_page_view` custom-event trigger and v2 data-layer variables for `page_path`, `page_location` and `page_referrer`. Use a native Google tag with `send_page_view=false` and a native GA4 `page_view` event using those fields. Fire the Google tag once per page before the event. Disable GA4 Enhanced Measurement and do not add automatic history/form/search triggers. Use native tags: the production CSP does not permit arbitrary inline Custom HTML.
 
-Ads are disabled by default (`VITE_ADSENSE_ENABLED=false`). Obtain publisher/slot IDs from AdSense, finish account/site approval, domain-level ads.txt verification and the required Google-certified CMP before enabling ads; the analytics panel is not that CMP. Ads are kept outside the playable game surface to reduce accidental clicks. `/ads.txt` is generated from the publisher ID while ad serving is disabled, allowing ownership verification before launch. Do not click your own ads to test.
+Ads are disabled by default (`VITE_ADSENSE_ENABLED=false`). In that state, the home and leaderboard placements open the visitor's mail app with an advertising inquiry to `VITE_CONTACT_EMAIL` (default: `mucahidyazar@gmail.com`). No email is sent automatically and no ad script loads. Obtain publisher/slot IDs from AdSense, finish account/site approval, domain-level ads.txt verification and the required Google-certified CMP before enabling ads; the analytics panel is not that CMP. Ads are kept outside the playable game surface to reduce accidental clicks. `/ads.txt` is generated from the publisher ID while ad serving is disabled, allowing ownership verification before launch. Do not click your own ads to test.
 
 ## Contributing
 
@@ -128,4 +128,4 @@ Focused issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING
 
 ## License
 
-The repository is public, but the owner has not yet selected a reuse license. Until a LICENSE file is added, public visibility does not grant an open-source license.
+Project code is available under the [MIT License](LICENSE). Third-party assets and dependencies retain their own licenses and attribution.

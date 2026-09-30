@@ -48,27 +48,30 @@ function AdSenseUnit({ client, slot }: AdSenseUnitProps) {
 }
 
 function AdPlaceholder() {
+  const subject = encodeURIComponent(`${new URL(siteConfig.url).hostname} — Advertising inquiry`)
+  const body = encodeURIComponent(`Hello,\n\nI'd like to advertise on ${siteConfig.url}.\n\nBrand / website:\nCampaign duration:\nMessage:\n`)
   return (
-    <div className="grid min-h-[250px] place-items-center rounded-[8px] border border-dashed border-line-strong bg-page px-6 text-center">
+    <a
+      href={`mailto:${siteConfig.contactEmail ?? 'mucahidyazar@gmail.com'}?subject=${subject}&body=${body}`}
+      className="grid min-h-[250px] place-items-center rounded-[8px] border border-dashed border-line-strong bg-page px-6 py-5 text-center transition hover:border-action focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action"
+    >
       <div>
-        <p className="text-[0.82rem] font-semibold text-ink-soft">Your ad here</p>
-        <p className="mt-0.5 text-[0.7rem] text-subtle">300 × 250 · Google AdSense</p>
+        <p className="text-[0.82rem] font-semibold text-ink-soft">Advertise here</p>
+        <p className="mt-0.5 text-[0.7rem] text-subtle">Email us about advertising and sponsorship</p>
       </div>
-    </div>
+    </a>
   )
 }
 
 /**
  * Sidebar advertisement. Renders a real AdSense unit once VITE_ADSENSE_CLIENT
- * and VITE_ADSENSE_SLOT_SIDEBAR are configured. Until then, development builds
- * show a labelled placeholder and production builds render nothing, so real
- * visitors never see an empty ad box.
+ * and VITE_ADSENSE_SLOT_SIDEBAR are configured and explicitly enabled.
+ * Otherwise, the placement opens an advertising inquiry in the visitor's mail app.
  */
 export function AdSlot({ className = '' }: AdSlotProps) {
   const { client, sidebarSlot } = siteConfig.adsense
   const isConfigured =
     import.meta.env.VITE_ADSENSE_ENABLED?.trim().toLowerCase() === 'true' && client !== null && sidebarSlot !== null
-  if (!isConfigured && !import.meta.env.DEV) return null
 
   return (
     <aside aria-label="Advertisement" className={`card p-3 ${className}`}>

@@ -8,6 +8,7 @@ import { GameCard } from './GameCard'
 import { categoryHref, parseCategoryFilter, type CategoryFilter } from './portalParams'
 import { TopPlayers } from './TopPlayers'
 import { useAccount } from '@/features/account/queries'
+import { AdSlot } from '@/components/ads/AdSlot'
 
 const FEATURED = gameById('trap-the-orb')
 
@@ -258,6 +259,7 @@ export function PortalHome() {
                 {account.status === 'signedIn' ? 'Your profile' : 'Sign in'}
               </Link>
             </div>
+            <AdSlot />
           </div>
         </div>
       </div>

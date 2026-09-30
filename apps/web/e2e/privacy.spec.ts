@@ -1,6 +1,26 @@
 import { expect, test } from '@playwright/test'
 import { mockApi } from './fakeApi'
 
+test('advertising placements open email inquiries outside the game surface', async ({ page }) => {
+  await mockApi(page)
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Only necessary' }).click()
+  const placement = page.getByRole('complementary', { name: 'Advertisement', exact: true })
+  const link = placement.getByRole('link', { name: 'Advertise here' })
+  await expect(link).toBeVisible()
+  const href = new URL((await link.getAttribute('href'))!)
+  expect(href.protocol).toBe('mailto:')
+  expect(href.searchParams.get('subject')).toContain('games.mucahid.dev')
+  await link.focus()
+  await expect(link).toBeFocused()
+  await page.goto('/trap-the-orb/leaderboards')
+  await expect(placement.getByRole('link', { name: 'Advertise here' })).toBeVisible()
+  await page.goto('/trap-the-orb')
+  await expect(placement).toHaveCount(0)
+  await expect(page.locator('script[src*="googlesyndication"],ins.adsbygoogle')).toHaveCount(0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0)
+})
+
 test('analytics is opt-in, path-only, and withdrawn through privacy settings', async ({ page }) => {
   await mockApi(page)
   const requests: string[] = []
