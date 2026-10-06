@@ -4,7 +4,7 @@ Unity projects live in `unity/<Project>/`. They are separate from the pnpm works
 
 | Project | Unity | Render pipeline | Notes |
 | --- | --- | --- | --- |
-| `Sandbox` | 6000.5.0f1 | URP 3D | Placeholder name from setup. Rename the folder and `productName` when the game has a name. |
+| `TrapTheOrb` | 6000.5.0f1 | URP 3D | Product name "Trap The Orb". |
 
 ## Toolchain
 
@@ -16,6 +16,7 @@ Unity projects live in `unity/<Project>/`. They are separate from the pnpm works
 | `unity-mcp` CLI | `~/.local/bin/unity-mcp` (`uv tool install mcpforunityserver==10.2.0`) | The same commands from Bash. Reads `UNITY_MCP_HTTP_PORT`. |
 | glTFast 6.20.0 | `Packages/manifest.json` | Imports `.glb` and `.gltf`. |
 | Unity plugin for Claude Code | `.claude/settings.json` | Skills such as `ui-uitk`, `optimize-web`, `urp-postprocessing`. |
+| `check-compile.py`, `run-tests.py` | `unity/scripts/` | Compile assemblies without the editor; run EditMode/PlayMode tests in the open editor through MCP. |
 
 Keep the package, the `unity-mcp` CLI and the server on the same version.
 
