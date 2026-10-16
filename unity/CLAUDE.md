@@ -57,7 +57,11 @@ The UI is built in code with UI Toolkit (`Assets/_Project/App/UI`), designed for
 - The HUD's main row (pause, progress, lives, level and score) fits a 360 dp phone. A countdown and a wall budget go in a second row, and more than three lives show as one heart and a count.
 - Bottom sheets slide over them through `SheetLayer`: the game's own (pause, level cleared) and the ones the player opens (modes, Custom setup, settings, how to play, high scores).
 - `ScreenRoutes` decides which screen, sheet and back-button action the game state calls for. It is plain logic with unit tests; keep decisions there rather than in the views. Android's back closes a sheet, pauses or resumes, leaves a finished run, and on the home screen sends the app to the background.
-- Predictive back is off in the Player settings (`androidPredictiveBackSupport: 0`). With it on, Android sometimes ran its own back as well as the game's and finished the activity, which left a blank screen on the next start.
+- Predictive back is off in the Player settings (`androidPredictiveBackSupport: 0`). Measured with it on (Unity 6000.5, GameActivity 4.4.0):
+  - The back key reached Unity through GameActivity's text input connection, so an `OnBackInvokedCallback` registered from C# never saw it.
+  - Android sometimes ran its own back as well and finished the activity, which left a blank screen on the next start.
+- Android 16 still honours the opt-out for apps targeting API 36. Measure again before raising the target SDK.
+- Back arrives as Escape with the press and the release in the same frame. `GameApp` reads it through an `InputAction`; `wasPressedThisFrame` misses it.
 - Styles: `Tokens.uss` (colours of both themes), `Base.uss` (controls), `Game.uss` (screens), `Panels.uss` (sheets), `Dialogs.uss` (long sheet content). USS has no sibling selectors or `:last-child`, so gaps between children come from `Ui.Spaced` in code.
 - Every control is at least 44pt tall, and frequent actions sit in the lower half of the screen.
 - Reduced motion turns every transition into a jump: the scripted ones in `UiMotion` and the styles' own (the `app--reduced-motion` class). It is on when the in-game setting is, or when the system asks for it (iOS Reduce Motion, Android "Remove animations"), which then locks the setting.
