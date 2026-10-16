@@ -31,8 +31,23 @@ namespace TrapTheOrb.EditorTools
 
         private static void BuildIos(iOSSdkVersion sdk, string folder)
         {
+            iOSSdkVersion previous = PlayerSettings.iOS.sdkVersion;
             PlayerSettings.iOS.sdkVersion = sdk;
-            Build(BuildTarget.iOS, Path.Combine(BuildFolder, folder), BuildOptions.None);
+            try
+            {
+                string output = Path.Combine(BuildFolder, folder);
+                // Appending to an earlier export keeps unchanged files, so Xcode recompiles only what changed
+                // instead of all of IL2CPP's C++.
+                BuildOptions options = BuildPipeline.BuildCanBeAppended(BuildTarget.iOS, output) == CanAppendBuild.Yes
+                    ? BuildOptions.AcceptExternalModificationsToPlayer
+                    : BuildOptions.None;
+                Build(BuildTarget.iOS, output, options);
+            }
+            finally
+            {
+                // A simulator build must not leave the committed player settings pointing at the simulator SDK.
+                PlayerSettings.iOS.sdkVersion = previous;
+            }
         }
 
         private static void Build(BuildTarget target, string output, BuildOptions options)

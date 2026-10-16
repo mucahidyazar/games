@@ -470,8 +470,11 @@ namespace TrapTheOrb.App.Tests
             (GameController controller, _) = Setup();
             controller.StartRun(42);
 
-            Assert.That(controller.CellAt(10, 10), Is.EqualTo(new CellPoint(3, 3)));
+            // A cell is 1000 / 300 units wide. Points sit inside cells: on a cell edge, rounding picks the side.
+            Assert.That(controller.CellAt(12, 12), Is.EqualTo(new CellPoint(3, 3)));
+            Assert.That(controller.CellAt(998, 498), Is.EqualTo(new CellPoint(299, 149)));
             Assert.That(controller.CellAt(-1, 10), Is.Null);
+            Assert.That(controller.CellAt(1001, 10), Is.Null);
             Assert.That(controller.BuildAtPoint(500, 250, Orientation.Horizontal), Is.True);
             Assert.That(controller.State.Walls[0].Orientation, Is.EqualTo(Orientation.Horizontal));
         }

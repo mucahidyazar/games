@@ -52,7 +52,9 @@ def sources_for(asmdef, all_asmdefs):
 
 
 def latest_rsp(project, name):
-    candidates = glob.glob(os.path.join(project, "Library", "Bee", "artifacts", "*.dag", f"{name}.rsp"))
+    # Editor compilations only (…E.dag). A player build's dag (…P.dag) leaves out UNITY_EDITOR, so editor-only
+    # code would look broken after any player build.
+    candidates = glob.glob(os.path.join(project, "Library", "Bee", "artifacts", "*E.dag", f"{name}.rsp"))
     return max(candidates, key=os.path.getmtime) if candidates else None
 
 
@@ -85,7 +87,11 @@ def uses_nunit(asmdef):
 def template_candidates(asmdef, all_asmdefs):
     """Assemblies whose flags a new assembly can borrow, best match first."""
     if not is_editor_only(asmdef):
-        return [TEMPLATES["runtime"]]
+        if not uses_nunit(asmdef):
+            return [TEMPLATES["runtime"]]
+        # A play mode test assembly needs NUnit and the test runner, which only the test assemblies reference.
+        tests = [a["name"] for a in all_asmdefs if a["name"] != asmdef["name"] and is_editor_only(a) and uses_nunit(a)]
+        return tests + [TEMPLATES["runtime"]]
     # A test assembly needs NUnit and the test runner; another project test assembly has exactly those.
     siblings = [a["name"] for a in all_asmdefs if a["name"] != asmdef["name"] and is_editor_only(a)]
     tests = [name for name in siblings if uses_nunit(next(a for a in all_asmdefs if a["name"] == name))]
@@ -121,10 +127,15 @@ def compile_assembly(project, asmdef, all_asmdefs, outputs, workdir):
                 continue  # replaced by the freshly compiled assembly below
         kept.append(line)
 
-    # A borrowed template does not reference our own assemblies; add every one this asmdef depends on.
+    # A borrowed template does not reference our own assemblies; add every one this asmdef depends on. A package
+    # assembly added to the asmdef since Unity last compiled it comes from Library/ScriptAssemblies.
     for reference in asmdef["data"].get("references", []):
         if reference in outputs:
             kept.append(f'-r:"{outputs[reference]}"')
+            continue
+        package = os.path.join(project, "Library", "ScriptAssemblies", f"{reference}.dll")
+        if os.path.exists(package) and not any(f"{reference}.dll" in line for line in kept if line.startswith("-r:")):
+            kept.append(f'-r:"{package}"')
 
     output = os.path.join(workdir, f"{name}.dll")
     kept.append(f'-out:"{output}"')
