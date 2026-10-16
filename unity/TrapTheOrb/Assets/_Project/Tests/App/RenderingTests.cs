@@ -154,30 +154,33 @@ namespace TrapTheOrb.App.Tests
         }
     }
 
-    public sealed class ShadowTests
+    public sealed class GradientTextureTests
     {
         [Test]
-        public void PaintsOnlyOutsideTheElement()
+        public void RunsFromTheFirstStopAtTheTopToTheLastAtTheBottom()
         {
-            var shadow = new[] { new BoxShadow(0, 4, 12, 0, new Color32(0, 0, 0, 255)) };
-
-            Texture2D texture = ShadowPainter.Paint(40, 20, 6, 22, shadow);
+            Texture2D texture = GradientTexture.Vertical((0f, new Color(1, 0, 0, 0)), (0.5f, new Color(1, 0, 0, 0.5f)), (1f, Color.red));
             try
             {
-                float ppu = ShadowPainter.PixelsPerUnit;
-                // Centre of the element: cut out. Just below it: shadow.
-                Color32 inside = texture.GetPixel(Mathf.RoundToInt((22 + 20) * ppu), texture.height - Mathf.RoundToInt((22 + 10) * ppu));
-                Color32 below = texture.GetPixel(Mathf.RoundToInt((22 + 20) * ppu), texture.height - Mathf.RoundToInt((22 + 23) * ppu));
-                Color32 corner = texture.GetPixel(0, 0);
+                // Texture rows start at the bottom, and UI Toolkit draws the last row at the top of the element.
+                Color top = texture.GetPixel(0, texture.height - 1);
+                Color middle = texture.GetPixel(0, texture.height / 2);
+                Color bottom = texture.GetPixel(0, 0);
 
-                Assert.That(inside.a, Is.EqualTo(0));
-                Assert.That(below.a, Is.GreaterThan(40));
-                Assert.That(corner.a, Is.LessThan(8));
+                Assert.That(top.a, Is.LessThan(0.01f));
+                Assert.That(middle.a, Is.EqualTo(0.5f).Within(0.02f));
+                Assert.That(bottom.a, Is.GreaterThan(0.99f));
             }
             finally
             {
                 UnityEngine.Object.DestroyImmediate(texture);
             }
+        }
+
+        [Test]
+        public void NeedsAtLeastOneStop()
+        {
+            Assert.Throws<ArgumentException>(() => GradientTexture.Vertical());
         }
     }
 }

@@ -7,6 +7,7 @@ using TrapTheOrb.App.Storage;
 using TrapTheOrb.App.UI;
 using TrapTheOrb.Engine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Rect = UnityEngine.Rect;
 
@@ -32,6 +33,7 @@ namespace TrapTheOrb.App.Bootstrap
         private SoundPlayer sound;
         private Rect appliedSafeArea;
         private Vector2Int appliedScreen;
+        private InputAction back;
 
         private void Awake()
         {
@@ -62,8 +64,9 @@ namespace TrapTheOrb.App.Bootstrap
             var storage = new PlayerPrefsStore();
             store = new PlayerStore(storage, () => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
-            sound = new SoundPlayer(audioSource, assets.Sounds()) { IsEnabled = store.Snapshot.Settings.SoundEnabled };
-            store.Changed += SyncSound;
+            sound = new SoundPlayer(audioSource, assets.Sounds());
+            SyncFeedback();
+            store.Changed += SyncFeedback;
 
             controller = new GameController(sound, Rng.RandomSeed());
             flow = new RunFlow(controller, () => DateTime.UtcNow);
@@ -78,15 +81,30 @@ namespace TrapTheOrb.App.Bootstrap
                 Share = NativeShare.Share,
                 Clock = () => Time.realtimeSinceStartupAsDouble * 1000,
                 Now = () => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                LeaveApp = AppLifecycle.MoveToBackground,
             });
             root.Add(screen);
             screen.StretchToParentSize();
+            screen.SetSystemReducedMotion(MotionPreference.IsReducedBySystem());
             ApplySafeArea(force: true);
+
+            // Android's back button and gesture arrive as Escape; predictive back is off in the Player settings, so
+            // the system never handles back on its own as well. An action sees every press, also one released in
+            // the same frame, as the back gesture delivers it; polling the key once a frame misses those.
+            back = new InputAction("Back", InputActionType.Button, "<Keyboard>/escape");
+            back.performed += OnBack;
+            back.Enable();
         }
 
         private void OnDisable()
         {
-            if (store != null) store.Changed -= SyncSound;
+            if (back != null)
+            {
+                back.performed -= OnBack;
+                back.Dispose();
+                back = null;
+            }
+            if (store != null) store.Changed -= SyncFeedback;
             screen?.Dispose();
             screen?.RemoveFromHierarchy();
             screen = null;
@@ -104,11 +122,24 @@ namespace TrapTheOrb.App.Bootstrap
             Screen.sleepTimeout = controller.State?.Status == GameStatus.Playing ? SleepTimeout.NeverSleep : SleepTimeout.SystemSetting;
         }
 
-        private void SyncSound() => sound.IsEnabled = store.Snapshot.Settings.SoundEnabled;
+        private void OnBack(InputAction.CallbackContext _) => screen?.GoBack();
+
+        /// <summary>Sound and vibration follow the player's settings.</summary>
+        private void SyncFeedback()
+        {
+            sound.IsEnabled = store.Snapshot.Settings.SoundEnabled;
+            Haptics.IsEnabled = store.Snapshot.Settings.HapticsEnabled;
+        }
 
         private void OnApplicationPause(bool isPaused)
         {
             if (isPaused) screen?.OnBackground();
+        }
+
+        /// <summary>The player may have changed the system's motion setting while away.</summary>
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus) screen?.SetSystemReducedMotion(MotionPreference.IsReducedBySystem());
         }
 
         private void ApplySafeArea(bool force)

@@ -19,6 +19,13 @@ namespace TrapTheOrb.App.Content
             return $"{totalSeconds / 60:00}:{totalSeconds % 60:00}";
         }
 
+        /// <summary>Like <see cref="Clock"/> without a leading zero: "0:42", "12:05".</summary>
+        public static string ShortClock(double ms)
+        {
+            string clock = Clock(ms);
+            return clock[0] == '0' ? clock.Substring(1) : clock;
+        }
+
         public static string Number(long value) => value.ToString("N0", English);
 
         /// <summary>Whole percent, floored so a nearly-reached target never looks reached.</summary>
@@ -51,5 +58,16 @@ namespace TrapTheOrb.App.Content
         public static string OneDecimal(double value) => value.ToString("0.0", English);
 
         public static string Plural(long count, string one, string many) => count == 1 ? one : many;
+
+        /// <summary>
+        /// Lets an "a · b · c" line wrap only after a separator, never inside a part: "∞ lives" stays together.
+        /// Spaces inside the parts become no-break spaces.
+        /// </summary>
+        public static string BreakAtSeparators(string text)
+        {
+            string[] parts = text.Split(new[] { " · " }, StringSplitOptions.None);
+            for (int i = 0; i < parts.Length; i++) parts[i] = parts[i].Replace(' ', '\u00A0');
+            return string.Join("\u00A0· ", parts);
+        }
     }
 }

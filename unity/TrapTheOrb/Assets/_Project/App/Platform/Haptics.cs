@@ -30,8 +30,12 @@ namespace TrapTheOrb.App.Platform
         private static bool isVibratorResolved;
 #endif
 
+        /// <summary>The player's vibration setting; off means no haptics at all.</summary>
+        public static bool IsEnabled { get; set; } = true;
+
         public static void Play(SoundName name)
         {
+            if (!IsEnabled) return;
             Kind? kind = name switch
             {
                 SoundName.Break => Kind.Break,

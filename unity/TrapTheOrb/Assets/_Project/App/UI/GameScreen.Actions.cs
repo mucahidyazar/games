@@ -1,11 +1,8 @@
 using System.Collections.Generic;
 using TrapTheOrb.App.Content;
 using TrapTheOrb.App.Core;
-using TrapTheOrb.App.Rendering;
 using TrapTheOrb.App.Run;
-using TrapTheOrb.App.Storage;
 using TrapTheOrb.App.UI.Overlay;
-using TrapTheOrb.App.UI.Sheets;
 using TrapTheOrb.Engine;
 
 namespace TrapTheOrb.App.UI
@@ -23,48 +20,21 @@ namespace TrapTheOrb.App.UI
             Resume = () => controller.Resume(),
             RestartLevel = () => controller.RestartLevel(),
             NextLevel = () => controller.NextLevel(),
-            BackToReady = BackToReady,
+            GoHome = GoHome,
             LeaveRun = LeaveRun,
-            OpenHowToPlay = OpenHowToPlay,
             SelectMode = SelectMode,
             ChangeCustom = custom => store.SetCustomSettings(custom),
             SaveHighScore = (name, result) => store.SubmitHighScore(name, result.Mode, result.Score, result.Level),
             Share = ShareResult,
+            OpenSheet = OpenSheet,
+            CloseSheet = CloseSheet,
+            SetSound = on => store.SetSoundEnabled(on),
+            SetHaptics = on => store.SetHapticsEnabled(on),
+            SetReducedMotion = on => store.SetReducedMotion(on),
+            SetTheme = SetTheme,
         };
 
         private CustomSettings CustomFor(GameMode mode) => mode == GameMode.Custom ? store.Snapshot.Settings.Custom : null;
-
-        /// <summary>The header's main button: play, continue, pause, resume or next.</summary>
-        private void RunPrimaryAction()
-        {
-            SavedRun saved = store.Snapshot.SavedRun;
-            SavedRun matchingSave = saved?.Mode == controller.Mode ? saved : null;
-            switch (PrimaryActions.For(controller.Hud, flow.Result != null, matchingSave != null))
-            {
-                case PrimaryAction.Pause:
-                    controller.Pause();
-                    break;
-                case PrimaryAction.Resume:
-                    controller.Resume();
-                    break;
-                case PrimaryAction.Next:
-                    controller.NextLevel();
-                    break;
-                case PrimaryAction.Continue:
-                    flow.ContinueSaved(matchingSave);
-                    break;
-                default:
-                    flow.Start();
-                    break;
-            }
-        }
-
-        /// <summary>The flag button asks first: it pauses, and the pause card offers "End run".</summary>
-        private void EndRunFromHeader()
-        {
-            if (controller.Hud.Status == HudStatus.Playing) controller.Pause();
-            else flow.EndRun();
-        }
 
         /// <summary>Picking another mode ends the run in progress.</summary>
         private void SelectMode(GameMode mode)
@@ -76,23 +46,31 @@ namespace TrapTheOrb.App.UI
             Refresh();
         }
 
-        /// <summary>From a finished run's result back to the start screen.</summary>
-        private void BackToReady()
+        /// <summary>From a finished run back to the home screen.</summary>
+        private void GoHome()
         {
             if (controller.IsRunActive) return;
             if (controller.Hud.InRun) controller.AbandonRun();
+            ShowHomePreview();
             flow.Reset();
             Refresh();
         }
 
-        /// <summary>Leaves a practice run for the start screen; its save lets it be continued later.</summary>
+        /// <summary>Leaves a practice run for the home screen; its save lets it be continued later.</summary>
         private void LeaveRun()
         {
             if (Modes.IsRanked(controller.Mode)) return;
             controller.AbandonRun();
+            ShowHomePreview();
             flow.Reset();
             Refresh();
         }
+
+        /// <summary>
+        /// The home screen previews the mode as the player set it up. A continued Custom run may have used an older
+        /// setup than the one saved since; the next run should not.
+        /// </summary>
+        private void ShowHomePreview() => controller.SetMode(controller.Mode, CustomFor(controller.Mode));
 
         /// <summary>Keeps unranked runs resumable: saved at every level start, forgotten at game over.</summary>
         private void SaveCasualRuns(IReadOnlyList<GameEvent> events, GameState state)
@@ -111,7 +89,7 @@ namespace TrapTheOrb.App.UI
                         store.SaveRun(mode, custom, started.Level, started.Score);
                         break;
                     case LevelCompleteEvent complete:
-                        // Leaving on the "level cleared" card should continue with the next level.
+                        // Leaving on the "level cleared" sheet should continue with the next level.
                         store.SaveRun(mode, custom, complete.Result.Level + 1, state.Score);
                         break;
                     case GameOverEvent _:
@@ -119,28 +97,6 @@ namespace TrapTheOrb.App.UI
                         break;
                 }
             }
-        }
-
-        private void ToggleSound() => store.SetSoundEnabled(!store.Snapshot.Settings.SoundEnabled);
-
-        private void ToggleTheme()
-        {
-            Theme next = services.Themes.Current == Theme.Navy ? Theme.Light : Theme.Navy;
-            services.Themes.Save(next);
-            ApplyTheme(next);
-            Refresh();
-        }
-
-        private void OpenHowToPlay() => OpenDialog("How to play", new HowToPlayView());
-
-        private void OpenHighScores() => OpenDialog("High scores", new HighScoresView(store, services.Now, controller.Mode));
-
-        /// <summary>Dialogs pause a running level, like the web's hash dialogs.</summary>
-        private void OpenDialog(string title, UnityEngine.UIElements.VisualElement content)
-        {
-            menu.SetOpen(false);
-            controller.Pause();
-            dialog.Open(title, content);
         }
 
         private void ShareResult(RunResult result)

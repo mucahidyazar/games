@@ -13,7 +13,7 @@ namespace TrapTheOrb.App.Core
         GameOver,
     }
 
-    /// <summary>Sound plus haptics, both behind the same on/off switch, like the web game.</summary>
+    /// <summary>Sound plus haptics for the game's moments; the player switches each one off on its own.</summary>
     public interface IFeedback
     {
         void Play(SoundName name);

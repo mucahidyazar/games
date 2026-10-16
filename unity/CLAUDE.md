@@ -10,7 +10,7 @@ Unity projects live in `unity/<Project>/`. They are separate from the pnpm works
 
 | Piece | Where | Purpose |
 | --- | --- | --- |
-| Unity Hub + Editor 6000.5.0f1 | `/Applications/Unity/Hub/Editor/` | Build modules installed: macOS (Mono), WebGL. |
+| Unity Hub + Editor 6000.5.0f1 | `/Applications/Unity/Hub/Editor/` | Build modules installed: macOS (Mono), WebGL, iOS, Android (with Unity's Android SDK, NDK and OpenJDK). |
 | Unity CLI (`unity`, 1.0.0-beta.8) | `~/.unity/bin/unity` | Open projects, register them in the Hub, install editors and modules, build, test. |
 | MCP for Unity 10.2.0 | `Packages/manifest.json`, pinned to `#v10.2.0` | Live control of the open editor. |
 | `unity-mcp` CLI | `~/.local/bin/unity-mcp` (`uv tool install mcpforunityserver==10.2.0`) | The same commands from Bash. Reads `UNITY_MCP_HTTP_PORT`. |
@@ -31,7 +31,7 @@ unity/scripts/open-editor.sh unity/Foo  # a specific project
 
 The editor owns the MCP server. It starts `http://127.0.0.1:8642/mcp` on load and stops it on quit. The port is 8642 because a Docker container on this machine uses 8080. The port is stored in the editor preferences of this machine, so it is the same for every Unity project.
 
-Claude Code is registered with `claude mcp add --scope local --transport http UnityMCP http://127.0.0.1:8642/mcp`. The tools are named `mcp__UnityMCP__*`. If the session started before the editor, run `/mcp` to reconnect.
+Claude Code is registered with `claude mcp add --scope local --transport http UnityMCP http://127.0.0.1:8642/mcp`. The tools are named `mcp__UnityMCP__*`. If the session started before the editor, run `/mcp` to reconnect. Local scope belongs to the folder, so register again after the repository moves.
 
 - Only the `core` tool group is on by default. Turn on `testing`, `ui`, `animation`, `vfx` and the others with `manage_tools` when a task needs them.
 - Edit C# with the normal file tools. Then refresh, wait for the compile, and read the console: `unity-mcp editor refresh`, then `unity-mcp editor console`.
@@ -49,6 +49,19 @@ Claude Code is registered with `claude mcp add --scope local --transport http Un
 - **Killing the editor leaves the MCP server running.** Stop it before the next start: `pkill -f mcp-for-unity`.
 - **Unity sign-in expires** when the Hub is not opened for a few weeks. The editor then exits with "No valid Unity Editor license found". The user signs in to the Hub again. Check with `unity license`.
 
+## Trap The Orb's mobile UI
+
+The UI is built in code with UI Toolkit (`Assets/_Project/App/UI`), designed for phones held upright; the product and design principles are in the repository's `PRODUCT.md`.
+
+- `GameScreen` shows one of three screens: `HomeView` (the field's live preview behind the title, the mode and the play button), the play screen (`GameHud`, the field, the wall direction control) and `RunOverView`. One `BoardView` moves between the home and play screens.
+- The HUD's main row (pause, progress, lives, level and score) fits a 360 dp phone. A countdown and a wall budget go in a second row, and more than three lives show as one heart and a count.
+- Bottom sheets slide over them through `SheetLayer`: the game's own (pause, level cleared) and the ones the player opens (modes, Custom setup, settings, how to play, high scores).
+- `ScreenRoutes` decides which screen, sheet and back-button action the game state calls for. It is plain logic with unit tests; keep decisions there rather than in the views. Android's back closes a sheet, pauses or resumes, leaves a finished run, and on the home screen sends the app to the background.
+- Predictive back is off in the Player settings (`androidPredictiveBackSupport: 0`). With it on, Android sometimes ran its own back as well as the game's and finished the activity, which left a blank screen on the next start.
+- Styles: `Tokens.uss` (colours of both themes), `Base.uss` (controls), `Game.uss` (screens), `Panels.uss` (sheets), `Dialogs.uss` (long sheet content). USS has no sibling selectors or `:last-child`, so gaps between children come from `Ui.Spaced` in code.
+- Every control is at least 44pt tall, and frequent actions sit in the lower half of the screen.
+- Reduced motion turns every transition into a jump: the scripted ones in `UiMotion` and the styles' own (the `app--reduced-motion` class). It is on when the in-game setting is, or when the system asks for it (iOS Reduce Motion, Android "Remove animations"), which then locks the setting.
+
 ## 3D assets from Meshy
 
 Meshy generation costs credits. State the cost and get the user's confirmation before every paid call.
@@ -64,8 +77,16 @@ The Blender MCP server is also connected. It needs Blender open with its add-on 
 
 ## Tests and builds
 
-- Tests use the Unity Test Framework: `unity-mcp editor tests --mode EditMode`, then `unity-mcp editor poll-test <job-id> --wait 60`. A run is slower while the editor is in the background.
-- Add build targets with `unity install-modules`. iOS and Android are not installed.
+Batch mode needs the project closed in the editor. Run it outside the Claude Code sandbox, which blocks the licensing client and `~/Library`, and use absolute paths. `Unity` below is `/Applications/Unity/Hub/Editor/6000.5.0f1/Unity.app/Contents/MacOS/Unity`.
+
+- **Tests:** `Unity -batchmode -projectPath <project> -runTests -testPlatform EditMode -testResults <results.xml> -logFile <log>`. The log ends with `Test run completed. Exiting with code 0 (Ok)` or `code 2 (Failed)`, and the XML lists each failure. This is more reliable than a run through MCP, which can report "None tests". With the editor open, use `unity-mcp editor tests --mode EditMode`, then `unity-mcp editor poll-test <job-id> --wait 60`; a run is slower while the editor is in the background.
+- **UI snapshots:** `TTO_SNAPSHOT_DIR=<folder> Unity -batchmode -projectPath <project> -runTests -testPlatform PlayMode -testCategory Snapshots -testResults <results.xml> -logFile <log>` renders every screen and sheet, in both themes, at iPhone 18 Pro, Pixel 8, iPhone SE and Galaxy S23 sizes into PNG files (`Tests/Snapshots/UiSnapshotTests.cs`). The Galaxy S23's 360 dp is the narrowest common Android width. It takes a few minutes, so check UI changes with it before a device build.
+- **Player builds:** `Unity -batchmode -quit -projectPath <project> -buildTarget iOS -executeMethod TrapTheOrb.EditorTools.BuildScripts.IosSimulator -logFile <log>`. The other methods are `IosDevice` and `AndroidApk` (with `-buildTarget Android`). Output goes to `Builds/` in the project, and the log says `… build succeeded`.
+- **iOS Simulator:** build `Builds/iOS-Simulator/Unity-iPhone.xcodeproj` (scheme `Unity-iPhone`) for the simulator, then install and launch the `.app` (bundle id `dev.mucahid.traptheorb`). The first Xcode build compiles all of IL2CPP's C++; later exports append to the Xcode project, so Xcode recompiles only what changed. Xcode 27's libc++ warns that it no longer supports the iOS 15 minimum.
+- **Android emulator:** the AVD `TrapTheOrb_Pixel_8` (Pixel 8, Android 16, Google APIs, arm64, 2 GB of RAM to spare this Mac's memory) is in `~/.android/avd`; the emulator, platform-tools and system image are in `~/Library/Android/sdk`. The AVD was written by hand, because Unity's `avdmanager` only sees Unity's own SDK. Start it with `~/Library/Android/sdk/emulator/emulator -avd TrapTheOrb_Pixel_8 -no-boot-anim`, then run `adb install -r Builds/Android/TrapTheOrb.apk` and `adb shell am start -n dev.mucahid.traptheorb/com.unity3d.player.UnityPlayerGameActivity` (`adb` is in `~/Library/Android/sdk/platform-tools`).
+- Unity sometimes crashes while quitting after a batch run (exit code 138, in `TcpMessagingSession`). The result line in the log is what counts.
+- This Mac has 16 GB of memory. An IL2CPP build next to the emulator, a simulator and other heavy apps fills the swap and the compilers nearly stop: one Android build took 66 minutes. Close what you can while building.
+- Add build targets with `unity install-modules`.
 
 ## Not installed on purpose
 

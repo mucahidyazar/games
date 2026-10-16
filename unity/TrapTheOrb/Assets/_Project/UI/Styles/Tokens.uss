@@ -1,7 +1,7 @@
 /*
- * Design tokens of the web game (apps/web/src/index.css). Navy dark is the default theme;
- * the root gets .theme-navy or .theme-light. Colours with alpha are spelled out, because
- * USS cannot mix a variable with an opacity.
+ * Design tokens of the mobile app. Navy is the default theme; the root gets .theme-navy or .theme-light.
+ * The palette is the web game's (apps/web/src/index.css); colours with alpha are spelled out, because USS cannot
+ * mix a variable with an opacity. Text colours keep WCAG AA contrast on the surfaces they sit on.
  */
 
 .app {
@@ -14,76 +14,94 @@
     --color-teal-300: #7fd9d0;
     --color-teal-400: #2ec4bc;
     --color-teal-500: #0bb3a8;
-    --color-teal-600: #087f79;
+    --color-on-teal: #06302f;
     --color-coral-400: #f87e7c;
     --color-coral-500: #ed6461;
     --color-coral-600: #d2423d;
     --color-coral-700: #b93532;
+    --color-on-coral: #ffffff;
     --color-gold: #fedb85;
     --color-silver: #d9dee8;
     --color-bronze: #ec9460;
     --color-star: #f5b83d;
-    --dialog-backdrop: rgba(11, 22, 48, 0.64);
-}
-
-.theme-light {
-    --color-page: #f9fafc;
-    --color-page-60: rgba(249, 250, 252, 0.6);
-    --color-surface: #ffffff;
-    --color-sunken: #f2f5f9;
-    --color-line: #e9eef4;
-    --color-line-strong: #e2e9f0;
-    --color-divider: #eef2f6;
-    --color-action: #0f2548;
-    --color-on-action: #ffffff;
-    --color-ink: #0f2548;
-    --color-ink-soft: #3a4b6e;
-    --color-muted: #5b6b86;
-    --color-subtle: #627189;
-    --color-icon: #627898;
-    --color-teal-50: #f0f9f9;
-    --color-teal-100: #e8f6f5;
-    --color-teal-150: #dcf1f0;
-    --color-teal-200: #d1f0ee;
-    --color-teal-700: #077f85;
-    --color-teal-800: #06646a;
-    --color-danger: #b93532;
-    --color-danger-soft: rgba(248, 126, 124, 0.1);
-    --color-ranked: rgba(248, 126, 124, 0.15);
-    --color-accent: #087f85;
-    --chrome-bg: #f9fafc;
-    --chrome-fg: #0f2548;
-    --chrome-muted: #5b6b86;
-    --chrome-border: #e9eef4;
 }
 
 .theme-navy {
     --color-page: #0b1630;
-    --color-page-60: rgba(11, 22, 48, 0.6);
     --color-surface: #13233e;
     --color-sunken: #192d49;
     --color-line: #2a3b56;
     --color-line-strong: #405672;
-    --color-divider: #263a57;
-    --color-action: #b2f2dd;
-    --color-on-action: #123a37;
     --color-ink: #f3f6fc;
     --color-ink-soft: #d7e1ef;
     --color-muted: #b0bfd4;
     --color-subtle: #9aacc5;
     --color-icon: #a6b9d1;
-    --color-teal-50: #132f3e;
-    --color-teal-100: #193b48;
-    --color-teal-150: #204854;
-    --color-teal-200: #285e65;
-    --color-teal-700: #7ee1d0;
-    --color-teal-800: #b0f0e1;
+    --color-accent: #7ee1d0;
+    --color-teal: #2ec4bc;
+    --color-teal-tint: #173c46;
+    --color-teal-ring: #2a8f8c;
     --color-danger: #ff9c9a;
-    --color-danger-soft: rgba(248, 126, 124, 0.1);
-    --color-ranked: rgba(248, 126, 124, 0.15);
-    --color-accent: #7fd9d0;
-    --chrome-bg: #0b1630;
-    --chrome-fg: #ffffff;
-    --chrome-muted: rgba(255, 255, 255, 0.68);
-    --chrome-border: rgba(255, 255, 255, 0.1);
+    --color-heart: #f87e7c;
+    --color-heart-lost: #33465f;
+    --color-scrim: rgba(4, 9, 22, 0.66);
+    --color-gold-tint: #4a3d18;
+    --color-gold-text: #ffd77a;
+    --color-switch-off: #405672;
+    --color-input: #0f1d36;
+
+    --mode-classic-bg: #16424a;
+    --mode-classic-fg: #7ee1d0;
+    --mode-daily-bg: #45391a;
+    --mode-daily-fg: #f7c75e;
+    --mode-time-bg: #183258;
+    --mode-time-fg: #8fc4ff;
+    --mode-walls-bg: #46301c;
+    --mode-walls-fg: #ffb36b;
+    --mode-hardcore-bg: #4a1f2c;
+    --mode-hardcore-fg: #ff94a6;
+    --mode-zen-bg: #2e2653;
+    --mode-zen-fg: #c6b4ff;
+    --mode-custom-bg: #22344e;
+    --mode-custom-fg: #b9c7da;
+}
+
+.theme-light {
+    --color-page: #f4f7fb;
+    --color-surface: #ffffff;
+    --color-sunken: #edf2f7;
+    --color-line: #dfe7ef;
+    --color-line-strong: #c9d5e1;
+    --color-ink: #0f2548;
+    --color-ink-soft: #2c3e60;
+    --color-muted: #4f5f7a;
+    --color-subtle: #5d6c84;
+    --color-icon: #5a6f8f;
+    --color-accent: #06737a;
+    --color-teal: #0bb3a8;
+    --color-teal-tint: #e2f5f3;
+    --color-teal-ring: #7fd3cb;
+    --color-danger: #b93532;
+    --color-heart: #e0504c;
+    --color-heart-lost: #d3dce6;
+    --color-scrim: rgba(15, 37, 72, 0.42);
+    --color-gold-tint: #fdf0c8;
+    --color-gold-text: #7a5600;
+    --color-switch-off: #c9d5e1;
+    --color-input: #f4f7fb;
+
+    --mode-classic-bg: #dcf3f0;
+    --mode-classic-fg: #06737a;
+    --mode-daily-bg: #fdf0cd;
+    --mode-daily-fg: #946200;
+    --mode-time-bg: #e1ecfd;
+    --mode-time-fg: #1d5fc4;
+    --mode-walls-bg: #fde9d6;
+    --mode-walls-fg: #a95308;
+    --mode-hardcore-bg: #fde3e8;
+    --mode-hardcore-fg: #b42a47;
+    --mode-zen-bg: #ebe5fe;
+    --mode-zen-fg: #5b3dc4;
+    --mode-custom-bg: #e7edf4;
+    --mode-custom-fg: #3f5270;
 }

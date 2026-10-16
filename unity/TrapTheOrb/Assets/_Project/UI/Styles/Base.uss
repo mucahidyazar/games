@@ -1,11 +1,11 @@
-/* Page, text, icons and the shared controls (cards, buttons, chips, sliders, inputs). */
+/* The app root, text, icons and the shared controls: buttons, switches, segmented controls, rows, inputs, sliders. */
 
 .app {
     flex-grow: 1;
     background-color: var(--color-page);
     color: var(--color-ink);
     font-size: 16px;
-    -unity-font-definition: var(--font-400);
+    -unity-font-definition: var(--font-500);
     -unity-font-style: normal;
 }
 
@@ -15,18 +15,27 @@
     padding: 0;
 }
 
-.app__safe {
-    flex-grow: 1;
+.layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
 }
 
 /* ---------------------------------------------------------------- icons */
 
 .icon {
-    width: 16px;
-    height: 16px;
+    width: 22px;
+    height: 22px;
     flex-shrink: 0;
     -unity-background-scale-mode: scale-to-fit;
     -unity-background-image-tint-color: var(--color-icon);
+}
+
+.icon--sm {
+    width: 18px;
+    height: 18px;
 }
 
 .icon--arrow-left { background-image: url("../Icons/arrow-left.svg"); }
@@ -34,21 +43,26 @@
 .icon--bulb { background-image: url("../Icons/bulb.svg"); }
 .icon--check { background-image: url("../Icons/check.svg"); }
 .icon--chevron-down { background-image: url("../Icons/chevron-down.svg"); }
+.icon--chevron-right { background-image: url("../Icons/chevron-right.svg"); }
 .icon--clock { background-image: url("../Icons/clock.svg"); }
 .icon--close { background-image: url("../Icons/close.svg"); }
 .icon--flag { background-image: url("../Icons/flag.svg"); }
 .icon--heart { background-image: url("../Icons/heart.svg"); }
 .icon--help { background-image: url("../Icons/help.svg"); }
+.icon--home { background-image: url("../Icons/home.svg"); }
 .icon--logo { background-image: url("../Icons/logo.svg"); -unity-background-image-tint-color: #ffffff; }
 .icon--menu { background-image: url("../Icons/menu.svg"); }
 .icon--moon { background-image: url("../Icons/moon.svg"); }
+.icon--motion { background-image: url("../Icons/motion.svg"); }
 .icon--pause { background-image: url("../Icons/pause.svg"); }
 .icon--play { background-image: url("../Icons/play.svg"); }
 .icon--restart { background-image: url("../Icons/restart.svg"); }
+.icon--settings { background-image: url("../Icons/settings.svg"); }
 .icon--share { background-image: url("../Icons/share.svg"); }
 .icon--star { background-image: url("../Icons/star.svg"); }
 .icon--sun { background-image: url("../Icons/sun.svg"); }
 .icon--trophy { background-image: url("../Icons/trophy.svg"); }
+.icon--vibrate { background-image: url("../Icons/vibrate.svg"); }
 .icon--volume-on { background-image: url("../Icons/volume-on.svg"); }
 .icon--volume-off { background-image: url("../Icons/volume-off.svg"); }
 .icon--wall-horizontal { background-image: url("../Icons/wall-horizontal.svg"); }
@@ -61,15 +75,6 @@
 .icon--mode-hardcore { background-image: url("../Icons/mode-hardcore.svg"); }
 .icon--mode-zen { background-image: url("../Icons/mode-zen.svg"); }
 .icon--mode-custom { background-image: url("../Icons/mode-custom.svg"); }
-
-/* ----------------------------------------------------------- surfaces */
-
-.card {
-    background-color: var(--color-surface);
-    border-width: 1px;
-    border-color: var(--color-line);
-    border-radius: 12px;
-}
 
 .shadow-layer {
     position: absolute;
@@ -84,265 +89,487 @@
     border-radius: 0;
     background-color: rgba(0, 0, 0, 0);
     color: var(--color-ink);
-    transition-property: scale, translate, opacity, background-color, border-color;
-    transition-duration: 200ms;
+    transition-property: scale, opacity, background-color;
+    transition-duration: 160ms;
     transition-timing-function: ease-out-cubic;
 }
 
-.button:disabled {
-    opacity: 0.6;
+.button:active {
+    scale: 0.97 0.97;
 }
 
-.action-button {
+/* The main action of a screen: coral, full width, 56pt tall. */
+.btn {
     flex-direction: row;
-    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    height: 40px;
-    padding: 0 16px;
-    border-radius: 9px;
+    flex-shrink: 0;
+    height: 56px;
+    padding: 0 20px;
+    border-radius: 18px;
 }
 
-.action-button:active {
-    scale: 0.98 0.98;
-}
-
-.action-button__label {
-    font-size: 14.4px;
-    -unity-font-definition: var(--font-700);
+.btn__label {
+    font-size: 18px;
+    letter-spacing: -0.15px;
+    -unity-font-definition: var(--font-800);
     -unity-text-align: middle-center;
     white-space: nowrap;
 }
 
-.action-button__icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
+.btn__icon {
+    width: 21px;
+    height: 21px;
+    margin-right: 10px;
 }
 
-.action-button__icon--after {
+.btn__icon--after {
     margin-right: 0;
-    margin-left: 8px;
+    margin-left: 10px;
 }
 
-.action-button--primary {
+.btn--primary {
     background-color: var(--color-coral-600);
 }
 
-.action-button--primary:active {
+.btn--primary:active {
     background-color: var(--color-coral-700);
 }
 
-.action-button--primary .action-button__label {
-    color: #ffffff;
+.btn--primary .btn__label {
+    color: var(--color-on-coral);
 }
 
-.action-button--primary .action-button__icon {
-    -unity-background-image-tint-color: #ffffff;
+.btn--primary .btn__icon {
+    -unity-background-image-tint-color: var(--color-on-coral);
 }
 
-.action-button--secondary {
+.btn--secondary {
+    height: 52px;
+    background-color: var(--color-sunken);
     border-width: 1px;
-    border-color: var(--color-line-strong);
-    background-color: var(--color-surface);
+    border-color: var(--color-line);
 }
 
-.action-button--secondary .action-button__label {
+.btn--secondary .btn__label {
+    font-size: 16px;
+    -unity-font-definition: var(--font-700);
     color: var(--color-ink);
 }
 
-.action-button--secondary .action-button__icon {
-    -unity-background-image-tint-color: var(--color-ink);
+.btn--secondary .btn__icon {
+    width: 20px;
+    height: 20px;
+    -unity-background-image-tint-color: var(--color-ink-soft);
 }
 
-.text-button__label {
-    font-size: 12.8px;
-    -unity-font-definition: var(--font-600);
-    color: var(--color-teal-700);
+.btn--ghost {
+    height: 48px;
 }
 
-.text-button--muted .text-button__label {
-    color: var(--color-muted);
+.btn--ghost .btn__label {
+    font-size: 15px;
+    -unity-font-definition: var(--font-700);
+    color: var(--color-ink-soft);
 }
 
-.text-button:active {
-    opacity: 0.7;
+.btn--ghost .btn__icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    -unity-background-image-tint-color: var(--color-ink-soft);
 }
 
-.square-button {
-    width: 40px;
-    height: 40px;
+.btn--danger .btn__label {
+    color: var(--color-danger);
+}
+
+.btn--danger .btn__icon {
+    -unity-background-image-tint-color: var(--color-danger);
+}
+
+.btn--grow {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+.btn-row {
+    flex-direction: row;
+    margin: 0 -5px;
+}
+
+.btn-row > .btn {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin: 0 5px;
+}
+
+/* A square 44pt button holding one icon. */
+.icon-button {
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    border-width: 1px;
-    border-radius: 9px;
-    border-color: var(--color-line);
+    border-radius: 14px;
     background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-line);
 }
 
-.square-button:disabled {
-    opacity: 0.45;
+.icon-button > .icon {
+    -unity-background-image-tint-color: var(--color-ink-soft);
 }
 
-.square-button:active {
-    scale: 0.96 0.96;
+.icon-button--bare {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
 }
 
-.square-button__icon {
+.icon-button--bare > .icon {
+    -unity-background-image-tint-color: var(--color-muted);
+}
+
+/* ------------------------------------------------------ segmented control */
+
+.segmented {
+    flex-direction: row;
+    flex-shrink: 0;
+    height: 56px;
+    padding: 4px;
+    border-radius: 18px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-line);
+}
+
+.segmented--compact {
+    height: 46px;
+    padding: 0;
+    border-radius: 14px;
+}
+
+.segment {
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+}
+
+.segmented--compact .segment {
+    border-width: 4px;
+    border-color: var(--color-surface);
+    border-radius: 13px;
+}
+
+.segment__label {
+    font-size: 16px;
+    -unity-font-definition: var(--font-700);
+    color: var(--color-muted);
+    white-space: nowrap;
+}
+
+.segmented--compact .segment__label {
+    font-size: 14.5px;
+}
+
+.segment__icon {
     width: 20px;
     height: 20px;
+    margin-right: 8px;
+    -unity-background-image-tint-color: var(--color-muted);
 }
 
-.square-button__icon--accent {
-    -unity-background-image-tint-color: var(--color-teal-700);
+.segment--on {
+    background-color: var(--color-teal);
 }
 
-.square-button__icon--small {
+.segment--on .segment__label {
+    color: var(--color-on-teal);
+}
+
+.segment--on .segment__icon {
+    -unity-background-image-tint-color: var(--color-on-teal);
+}
+
+/* Reduced motion (the in-game setting or the system's): controls change state without animating. */
+.app--reduced-motion .button,
+.app--reduced-motion .switch,
+.app--reduced-motion .switch__knob {
+    transition-duration: 0s;
+}
+
+/* -------------------------------------------------------------- switch */
+
+.switch {
+    width: 52px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background-color: var(--color-switch-off);
+    transition-property: background-color;
+    transition-duration: 160ms;
+}
+
+.switch__knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    background-color: #ffffff;
+    transition-property: translate;
+    transition-duration: 180ms;
+    transition-timing-function: ease-out-cubic;
+}
+
+.switch--on {
+    background-color: var(--color-teal);
+}
+
+.switch--on .switch__knob {
+    translate: 20px 0;
+}
+
+/* --------------------------------------------------------------- tiles */
+
+.tile {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+}
+
+.tile > .icon {
+    width: 22px;
+    height: 22px;
+}
+
+.tile--classic { background-color: var(--mode-classic-bg); }
+.tile--classic > .icon { -unity-background-image-tint-color: var(--mode-classic-fg); }
+.tile--daily { background-color: var(--mode-daily-bg); }
+.tile--daily > .icon { -unity-background-image-tint-color: var(--mode-daily-fg); }
+.tile--timeAttack { background-color: var(--mode-time-bg); }
+.tile--timeAttack > .icon { -unity-background-image-tint-color: var(--mode-time-fg); }
+.tile--limitedWalls { background-color: var(--mode-walls-bg); }
+.tile--limitedWalls > .icon { -unity-background-image-tint-color: var(--mode-walls-fg); }
+.tile--hardcore { background-color: var(--mode-hardcore-bg); }
+.tile--hardcore > .icon { -unity-background-image-tint-color: var(--mode-hardcore-fg); }
+.tile--zen { background-color: var(--mode-zen-bg); }
+.tile--zen > .icon { -unity-background-image-tint-color: var(--mode-zen-fg); }
+.tile--custom { background-color: var(--mode-custom-bg); }
+.tile--custom > .icon { -unity-background-image-tint-color: var(--mode-custom-fg); }
+
+/* ---------------------------------------------------------------- rows */
+
+/* A full-width tappable row: leading icon or tile, text, trailing control. */
+.row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 56px;
+}
+
+.row__icon {
+    margin-right: 14px;
+    -unity-background-image-tint-color: var(--color-muted);
+}
+
+.row__text {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.row__title {
+    font-size: 16.5px;
+    -unity-font-definition: var(--font-600);
+    color: var(--color-ink);
+    white-space: normal;
+}
+
+.row__detail {
+    margin-top: 2px;
+    font-size: 13.5px;
+    color: var(--color-subtle);
+    white-space: normal;
+}
+
+/* A setting the system has decided: shown, but locked. */
+.row:disabled .switch {
+    opacity: 0.55;
+}
+
+.row__subtitle {
+    margin-top: 2px;
+    font-size: 14px;
+    color: var(--color-muted);
+    white-space: normal;
+}
+
+.row__trail {
+    margin-left: 12px;
+    font-size: 14px;
+    -unity-font-definition: var(--font-700);
+    color: var(--color-subtle);
+}
+
+.row__chevron {
     width: 18px;
     height: 18px;
+    margin-left: 8px;
+    -unity-background-image-tint-color: var(--color-subtle);
 }
 
-/* ----------------------------------------------------- small pieces */
+/* Rows in a group get a hairline above each of them: one above the group, then one between rows. */
+.row-group > .row {
+    border-top-width: 1px;
+    border-color: var(--color-line);
+}
 
-.chips {
+/* --------------------------------------------------------------- pills */
+
+.pill {
     flex-direction: row;
-    flex-wrap: wrap;
-    margin-top: 12px;
+    align-items: center;
+    align-self: center;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 17px;
+    background-color: var(--color-gold-tint);
+}
+
+.pill__icon {
+    width: 17px;
+    height: 17px;
+    margin-right: 6px;
+    -unity-background-image-tint-color: var(--color-gold-text);
+}
+
+.pill__label {
+    font-size: 14.5px;
+    -unity-font-definition: var(--font-800);
+    color: var(--color-gold-text);
+}
+
+.pill--teal {
+    background-color: var(--color-teal-tint);
+}
+
+.pill--teal .pill__icon {
+    -unity-background-image-tint-color: var(--color-accent);
+}
+
+.pill--teal .pill__label {
+    color: var(--color-accent);
 }
 
 .chip {
     margin: 0 6px 6px 0;
-    padding: 2px 8px;
+    padding: 4px 10px;
     border-radius: 999px;
-    background-color: var(--color-teal-50);
-    color: var(--color-teal-800);
-    font-size: 11.2px;
+    background-color: var(--color-sunken);
+    color: var(--color-ink-soft);
+    font-size: 13px;
     -unity-font-definition: var(--font-600);
     white-space: nowrap;
 }
 
-.eyebrow {
-    color: var(--color-teal-700);
-    font-size: 10.24px;
-    letter-spacing: 1.43px;
-    -unity-font-definition: var(--font-700);
+/* -------------------------------------------------------------- inputs */
+
+.text-input {
+    flex-grow: 1;
+    margin: 0;
 }
 
-.note {
-    width: 100%;
-    margin-top: 12px;
-    padding: 8px 12px;
-    border-radius: 10px;
-    background-color: var(--color-page);
-    color: var(--color-muted);
-    font-size: 12.48px;
-    white-space: normal;
+.text-input > .unity-text-field__input,
+.text-input .unity-base-text-field__input {
+    height: 54px;
+    margin: 0;
+    padding: 0 16px;
+    border-width: 1.5px;
+    border-radius: 16px;
+    border-color: var(--color-line-strong);
+    background-color: var(--color-input);
+    color: var(--color-ink);
+    font-size: 17px;
+    -unity-font-definition: var(--font-600);
+    --unity-cursor-color: var(--color-teal);
+    --unity-selection-color: var(--color-teal-tint);
 }
 
-.note--alert {
-    background-color: var(--color-danger-soft);
-    color: var(--color-danger);
+.text-input:focus .unity-base-text-field__input {
+    border-color: var(--color-teal);
 }
 
-.orb-lineup {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    flex-shrink: 0;
+.text-input .unity-base-text-field__input--placeholder,
+.text-input .unity-text-element--placeholder {
+    color: var(--color-subtle);
 }
 
-.orb-dot {
-    margin-right: 4px;
-    border-radius: 999px;
-    -unity-background-scale-mode: scale-to-fit;
-}
+/* --------------------------------------------------------------- slider */
 
-.orb-dot--sm {
-    width: 10px;
-    height: 10px;
-}
-
-.orb-dot--md {
-    width: 14px;
-    height: 14px;
-}
-
-.orb-dot--tier0 { background-image: url("../../Art/Orbs/lineup-tier0.png"); }
-.orb-dot--tier1 { background-image: url("../../Art/Orbs/lineup-tier1.png"); }
-.orb-dot--tier2 { background-image: url("../../Art/Orbs/lineup-tier2.png"); }
-.orb-dot--tier3 { background-image: url("../../Art/Orbs/lineup-tier3.png"); }
-
-/* ------------------------------------------------------------- slider */
-
+/* Inset by the thumb's radius, so the thumb never pokes out of a scrolling sheet at either end. */
 .range {
-    height: 20px;
+    height: 44px;
+    margin: 0 12px;
     justify-content: center;
 }
 
 .range__rail {
     height: 6px;
     border-radius: 3px;
-    background-color: var(--color-line-strong);
+    background-color: var(--color-sunken);
     overflow: hidden;
 }
 
 .range__fill {
     height: 100%;
-    background-color: var(--color-teal-500);
+    background-color: var(--color-teal);
 }
 
 .range__thumb {
     position: absolute;
-    top: 2px;
-    width: 16px;
-    height: 16px;
-    border-radius: 8px;
-    border-width: 2px;
-    border-color: var(--color-teal-600);
-    background-color: var(--color-surface);
-    translate: -8px 0;
-    transition-property: scale;
-    transition-duration: 150ms;
-}
-
-.range--active .range__thumb {
-    scale: 1.15 1.15;
+    top: 10px;
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    border-width: 1px;
+    border-color: var(--color-line-strong);
 }
 
 .range--disabled {
-    opacity: 0.35;
+    opacity: 0.4;
 }
 
-/* --------------------------------------------------------------- input */
+/* ------------------------------------------------------------ orb dots */
 
-.text-input {
-    flex-grow: 1;
-    flex-shrink: 1;
-    min-width: 0;
-    margin: 0 8px 0 0;
+.orb-lineup {
+    flex-direction: row;
+    align-items: center;
 }
 
-.text-input > .unity-text-field__input,
-.text-input .unity-base-text-field__input {
-    height: 40px;
-    padding: 0 12px;
-    border-width: 1px;
-    border-radius: 9px;
-    border-color: var(--color-line-strong);
-    background-color: var(--color-surface);
-    color: var(--color-ink);
-    font-size: 14.4px;
-    -unity-font-definition: var(--font-600);
-    -unity-text-align: middle-left;
+.orb-dot {
+    margin: 0 2px;
+    -unity-background-scale-mode: scale-to-fit;
 }
 
-.text-input:focus .unity-base-text-field__input {
-    border-color: var(--color-teal-500);
+.orb-dot--sm {
+    width: 12px;
+    height: 12px;
 }
 
-.text-input .unity-base-text-field__input--placeholder,
-.text-input .unity-text-element--placeholder {
-    color: var(--color-subtle);
-    -unity-font-definition: var(--font-500);
+.orb-dot--md {
+    width: 16px;
+    height: 16px;
 }
+
+.orb-dot--tier0 { background-image: url("../../Art/Orbs/lineup-tier0.png"); }
+.orb-dot--tier1 { background-image: url("../../Art/Orbs/lineup-tier1.png"); }
+.orb-dot--tier2 { background-image: url("../../Art/Orbs/lineup-tier2.png"); }
+.orb-dot--tier3 { background-image: url("../../Art/Orbs/lineup-tier3.png"); }

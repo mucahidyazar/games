@@ -1,4 +1,4 @@
-// Native helpers for Trap The Orb on iOS: haptic feedback, the share sheet and the screen scale.
+// Native helpers for Trap The Orb on iOS: haptic feedback, the share sheet, the screen scale and Reduce Motion.
 #import <UIKit/UIKit.h>
 
 extern UIViewController* UnityGetGLViewController(void);
@@ -41,6 +41,12 @@ void TTO_Share(const char* text)
 float TTO_ScreenScale(void)
 {
     return (float)[UIScreen mainScreen].nativeScale;
+}
+
+/// 1 when Reduce Motion is on in the system's accessibility settings.
+int TTO_ReduceMotion(void)
+{
+    return UIAccessibilityIsReduceMotionEnabled() ? 1 : 0;
 }
 
 }

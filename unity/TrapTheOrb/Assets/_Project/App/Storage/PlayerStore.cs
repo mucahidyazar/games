@@ -33,6 +33,10 @@ namespace TrapTheOrb.App.Storage
 
         public void SetSoundEnabled(bool enabled) => UpdateSettings(Snapshot.Settings with { SoundEnabled = enabled });
 
+        public void SetHapticsEnabled(bool enabled) => UpdateSettings(Snapshot.Settings with { HapticsEnabled = enabled });
+
+        public void SetReducedMotion(bool reduced) => UpdateSettings(Snapshot.Settings with { ReducedMotion = reduced });
+
         /// <summary>Remembers the mode the game should open with.</summary>
         public void SetLastMode(GameMode mode)
         {

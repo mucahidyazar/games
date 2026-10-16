@@ -136,7 +136,7 @@ namespace TrapTheOrb.App.Content
         private static readonly string[] All =
         {
             "Trap the orbs by dividing the space. The more area you capture, the higher your score!",
-            "Swipe to build a wall in the direction of your swipe, or tap the ↕ button to switch.",
+            "Swipe to build a wall in the direction of your swipe, or use the switch under the field.",
             "An orb that touches a wall while it is being built breaks it — and costs you a life.",
             "Orb colours show speed: blue is calm, orange quick, red fast and violet blazing.",
             "Each half of a wall grows on its own. One half can still finish if the other breaks.",

@@ -1,344 +1,26 @@
-/* Top bar, menu, level header, HUD and the board (SiteHeader, GameHeader, HudBar, GameBoard). */
+/* The three screens (home, play and the end of a run) and the field they share. */
 
-.topbar {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+/* ------------------------------------------------------------- field */
+
+.board-card {
     flex-shrink: 0;
-    height: 52px;
-    padding: 0 12px 0 16px;
-}
-
-.topbar__brand {
-    flex-direction: row;
-    align-items: center;
-    flex-shrink: 1;
-    min-width: 0;
-}
-
-.logo-tile {
-    width: 36px;
-    height: 36px;
-    padding: 2px;
-    border-radius: 11px;
-    background-color: var(--chrome-border);
-}
-
-.logo-tile__image {
-    width: 32px;
-    height: 32px;
-}
-
-.brand-name {
-    flex-direction: row;
-    margin-left: 10px;
-}
-
-.brand-name__text {
-    color: var(--color-ink);
-    font-size: 17.28px;
-    letter-spacing: -0.43px;
-    -unity-font-definition: var(--font-800);
-    white-space: nowrap;
-}
-
-.brand-name__text--accent {
-    color: var(--color-accent);
-}
-
-.topbar__actions {
-    flex-direction: row;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.chrome-button {
-    width: 36px;
-    height: 36px;
-    margin-left: 4px;
-    align-items: center;
-    justify-content: center;
+    border-width: 1.5px;
     border-radius: 18px;
-    opacity: 0.8;
-}
-
-.chrome-button:active {
-    scale: 0.95 0.95;
-    opacity: 1;
-}
-
-.chrome-button--filled {
-    background-color: var(--chrome-border);
-}
-
-.chrome-button--menu {
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-}
-
-.chrome-button__icon {
-    width: 18px;
-    height: 18px;
-    -unity-background-image-tint-color: var(--chrome-fg);
-}
-
-.chrome-button__icon--theme {
-    width: 19px;
-    height: 19px;
-}
-
-.chrome-button__icon--menu {
-    width: 20px;
-    height: 20px;
-}
-
-/* -------------------------------------------------------------- menu */
-
-.menu {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.menu__panel {
-    padding: 8px 12px 12px 12px;
-    border-top-width: 1px;
-    border-color: var(--chrome-border);
-    background-color: var(--chrome-bg);
-    transform-origin: top;
-}
-
-.menu__item {
-    flex-direction: row;
-    align-items: center;
-    height: 44px;
-    padding: 0 14px;
-    border-radius: 12px;
-}
-
-.menu__item:active {
-    background-color: var(--chrome-border);
-}
-
-.menu__item-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 12px;
-    -unity-background-image-tint-color: var(--chrome-muted);
-}
-
-.menu__item-label {
-    color: var(--chrome-fg);
-    font-size: 15.2px;
-    -unity-font-definition: var(--font-600);
-}
-
-/* ------------------------------------------------------ game column */
-
-.game {
-    flex-grow: 1;
-    padding: 4px 16px 0 16px;
-}
-
-.game-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-}
-
-.game-header__info {
-    flex-grow: 1;
-    flex-shrink: 1;
-    min-width: 0;
-    margin-right: 12px;
-}
-
-.game-header__title {
-    color: var(--color-ink);
-    font-size: 20.8px;
-    letter-spacing: -0.62px;
-    -unity-font-definition: var(--font-800);
-    white-space: nowrap;
-}
-
-.game-header__line {
-    flex-direction: row;
-    align-items: center;
-    margin-top: 4px;
-}
-
-.game-header__summary {
-    flex-shrink: 1;
-    margin-left: 4px;
-    color: var(--color-muted);
-    font-size: 12.48px;
-    white-space: nowrap;
+    border-color: var(--color-line);
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.game-header__actions {
-    flex-direction: row;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.game-header__actions > * {
-    margin-left: 8px;
-}
-
-.game-header__primary {
-    min-width: 84px;
-    padding: 0 12px;
-}
-
-/* --------------------------------------------------------------- HUD */
-
-.hud {
-    flex-shrink: 0;
-    margin-top: 12px;
-}
-
-.hud__card {
-    flex-direction: row;
-}
-
-.hud-stat {
-    flex-grow: 1;
-    flex-basis: 0;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    min-width: 0;
-    padding: 8px 4px;
-    border-left-width: 1px;
-    border-color: var(--color-divider);
-}
-
-.hud-stat--first {
-    border-left-width: 0;
-}
-
-.hud-stat__icon {
-    display: none;
-    width: 28px;
-    height: 28px;
-    margin-right: 10px;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.hud-stat__text {
-    align-items: center;
-    min-width: 0;
-}
-
-.hud-stat__label {
-    color: var(--color-subtle);
-    font-size: 9.6px;
-    letter-spacing: 0.77px;
-    -unity-font-definition: var(--font-600);
-    white-space: nowrap;
-}
-
-.hud-stat__value {
-    color: var(--color-ink);
-    font-size: 15.2px;
-    letter-spacing: -0.15px;
-    -unity-font-definition: var(--font-700);
-    white-space: nowrap;
-}
-
-.hud-stat__value--alert {
-    color: var(--color-coral-600);
-}
-
-.hud-stat__glyph {
-    width: 20px;
-    height: 20px;
-}
-
-.hud-stat__glyph--heart { -unity-background-image-tint-color: var(--color-coral-500); }
-.hud-stat__glyph--walls { -unity-background-image-tint-color: var(--color-teal-600); }
-.hud-stat__glyph--clock { -unity-background-image-tint-color: var(--color-subtle); }
-.hud-stat__glyph--timed { -unity-background-image-tint-color: var(--color-coral-500); }
-.hud-stat__glyph--star { -unity-background-image-tint-color: var(--color-star); }
-
-.area-ring {
-    width: 28px;
-    height: 28px;
-    --ring-track: var(--color-teal-150);
-    --ring-tick: var(--color-subtle);
-    --ring-reached: var(--color-accent);
-}
-
-.speed-gauge {
-    width: 28px;
-    height: 21px;
-    --gauge-track: var(--color-line-strong);
-    --gauge-needle: var(--color-ink);
-}
-
-.hud--wide .hud-stat {
-    justify-content: flex-start;
-    padding: 8px 12px;
-}
-
-.hud--wide .hud-stat__icon {
-    display: flex;
-}
-
-.hud--wide .hud-stat__text {
-    align-items: flex-start;
-}
-
-.hud--wide .hud-stat__label {
-    font-size: 10.24px;
-}
-
-.hud--wide .hud-stat__value {
-    font-size: 16.8px;
-}
-
-/* ------------------------------------------------------------- board */
-
-.board-area {
-    flex-grow: 1;
-    margin: 16px 0 12px 0;
-    align-items: center;
-    justify-content: center;
-}
-
-.board-card.card {
-    padding: 4px;
-    border-color: var(--color-line-strong);
-    background-color: var(--color-sunken);
+/* Behind the home screen the field runs edge to edge, without its frame. */
+.board-card--backdrop {
+    border-width: 0;
+    border-radius: 0;
 }
 
 .board {
     flex-grow: 1;
-    border-radius: 8px;
-    overflow: hidden;
 }
 
-.board__canvas {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.board__canvas--blurred {
-    filter: blur(2px);
-}
-
-.board__overlay-host,
+.board__canvas,
 .points-layer {
     position: absolute;
     left: 0;
@@ -359,9 +41,373 @@
 .points-popup__text {
     position: absolute;
     translate: -50% -50%;
-    font-size: 17px;
+    font-size: 18px;
     -unity-font-definition: var(--font-800);
     -unity-text-outline-width: 2px;
-    -unity-text-outline-color: rgba(255, 255, 255, 0.92);
     white-space: nowrap;
+}
+
+.theme-navy .points-popup__text {
+    -unity-text-outline-color: rgba(11, 22, 48, 0.9);
+}
+
+.theme-light .points-popup__text {
+    -unity-text-outline-color: rgba(255, 255, 255, 0.92);
+}
+
+/* -------------------------------------------------------------- home */
+
+.home__board-slot {
+    align-items: center;
+    justify-content: center;
+}
+
+.home__fade {
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.home__top {
+    position: absolute;
+    flex-direction: row;
+}
+
+.home__top > .icon-button {
+    margin-left: 10px;
+}
+
+.home__hero {
+    position: absolute;
+    top: 20%;
+    left: 24px;
+    right: 24px;
+    align-items: center;
+}
+
+.home__logo {
+    width: 76px;
+    height: 76px;
+}
+
+.wordmark {
+    flex-direction: row;
+    margin-top: 20px;
+}
+
+.wordmark__text {
+    font-size: 44px;
+    letter-spacing: -1.3px;
+    -unity-font-definition: var(--font-800);
+    color: var(--color-ink);
+    white-space: nowrap;
+}
+
+.wordmark__text--accent {
+    margin-left: 11px;
+    color: var(--color-accent);
+}
+
+.home__pitch {
+    margin-top: 12px;
+    max-width: 290px;
+    font-size: 17px;
+    color: var(--color-ink-soft);
+    -unity-text-align: upper-center;
+    white-space: normal;
+}
+
+.home__dock {
+    position: absolute;
+}
+
+.mode-card {
+    flex-direction: row;
+    align-items: center;
+    min-height: 76px;
+    padding: 12px 16px 12px 14px;
+    border-radius: 20px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-line);
+}
+
+.mode-card__text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-left: 14px;
+    overflow: hidden;
+}
+
+.mode-card__name {
+    font-size: 17px;
+    -unity-font-definition: var(--font-700);
+    color: var(--color-ink);
+}
+
+.mode-card__detail {
+    margin-top: 2px;
+    font-size: 14px;
+    color: var(--color-muted);
+    white-space: normal;
+}
+
+.mode-card__change {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.mode-card__change-label {
+    font-size: 15px;
+    -unity-font-definition: var(--font-700);
+    color: var(--color-accent);
+}
+
+.mode-card__chevron {
+    margin-left: 2px;
+    -unity-background-image-tint-color: var(--color-accent);
+}
+
+/* -------------------------------------------------------------- play */
+
+.play__inner {
+    flex-grow: 1;
+}
+
+/* The HUD: one row everywhere, plus a slim second row in modes with a countdown or a wall budget. */
+.hud {
+    flex-shrink: 0;
+}
+
+.hud__main {
+    flex-direction: row;
+    align-items: center;
+    height: 48px;
+}
+
+.hud__pause {
+    flex-shrink: 0;
+}
+
+.hud__area {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.area-ring {
+    width: 40px;
+    height: 40px;
+    --ring-track: var(--color-sunken);
+    --ring-progress: var(--color-teal);
+    --ring-reached: var(--color-accent);
+}
+
+.hud__area-text {
+    margin-left: 10px;
+}
+
+.hud__percent {
+    font-size: 19px;
+    -unity-font-definition: var(--font-800);
+    color: var(--color-ink);
+    white-space: nowrap;
+}
+
+.hud__target {
+    margin-top: 1px;
+    font-size: 12.5px;
+    -unity-font-definition: var(--font-600);
+    color: var(--color-subtle);
+    white-space: nowrap;
+}
+
+.hud__spacer {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.hud__lives {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.hud__hearts {
+    flex-direction: row;
+}
+
+.hud__heart {
+    width: 19px;
+    height: 19px;
+    margin-left: 2px;
+    -unity-background-image-tint-color: var(--color-heart);
+}
+
+.hud__heart--lost {
+    -unity-background-image-tint-color: var(--color-heart-lost);
+}
+
+.hud__lives-count {
+    margin-left: 3px;
+    font-size: 15px;
+    -unity-font-definition: var(--font-800);
+    color: var(--color-ink);
+    white-space: nowrap;
+}
+
+.hud__score-block {
+    align-items: flex-end;
+    flex-shrink: 0;
+    min-width: 72px;
+    margin-left: 14px;
+}
+
+.hud__level {
+    font-size: 12.5px;
+    -unity-font-definition: var(--font-600);
+    color: var(--color-subtle);
+    white-space: nowrap;
+}
+
+.hud__score {
+    margin-top: 1px;
+    font-size: 22px;
+    -unity-font-definition: var(--font-800);
+    color: var(--color-ink);
+    white-space: nowrap;
+}
+
+/* Lined up with the progress ring, under the pause button's column. */
+.hud__status {
+    flex-direction: row;
+    margin: 6px 0 0 56px;
+}
+
+.hud__chip {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    height: 30px;
+    margin-right: 8px;
+    padding: 0 11px;
+    border-radius: 15px;
+    background-color: var(--color-surface);
+    border-width: 1px;
+    border-color: var(--color-line);
+}
+
+.hud__chip-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    -unity-background-image-tint-color: var(--color-muted);
+}
+
+.hud__chip-text {
+    font-size: 14px;
+    -unity-font-definition: var(--font-700);
+    color: var(--color-ink);
+    white-space: nowrap;
+}
+
+.hud__chip--warn {
+    border-color: var(--color-coral-500);
+}
+
+.hud__chip--warn .hud__chip-text {
+    color: var(--color-danger);
+}
+
+.hud__chip--warn .hud__chip-icon {
+    -unity-background-image-tint-color: var(--color-danger);
+}
+
+.play__board-slot {
+    flex-grow: 1;
+    margin: 10px 0;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------------------------------------------------------- run over */
+
+.run-over__veil {
+    background-color: var(--color-page);
+}
+
+.run-over__content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.run-over__summary {
+    align-items: center;
+    margin-top: 6%;
+}
+
+.run-over__reason {
+    font-size: 16px;
+    -unity-font-definition: var(--font-700);
+    color: var(--color-muted);
+    -unity-text-align: upper-center;
+    white-space: normal;
+}
+
+.run-over__score {
+    margin: 10px 0 8px 0;
+    font-size: 80px;
+    letter-spacing: -3px;
+    -unity-font-definition: var(--font-800);
+    color: var(--color-ink);
+    white-space: nowrap;
+}
+
+.run-over__stats {
+    margin-top: 12px;
+    font-size: 16px;
+    -unity-font-definition: var(--font-600);
+    color: var(--color-ink-soft);
+}
+
+.run-over__save {
+    margin-top: 32px;
+}
+
+.run-over__save-title {
+    margin: 0 4px 10px 4px;
+    font-size: 15px;
+    -unity-font-definition: var(--font-700);
+    color: var(--color-ink);
+}
+
+.run-over__save-row {
+    flex-direction: row;
+}
+
+.run-over__save-button {
+    width: 96px;
+    height: 54px;
+    margin-left: 10px;
+}
+
+.run-over__note {
+    margin: 10px 4px 0 4px;
+    font-size: 13.5px;
+    color: var(--color-subtle);
+    white-space: normal;
+}
+
+.run-over__note--center {
+    margin-top: 20px;
+    -unity-text-align: upper-center;
+}
+
+.run-over__spacer {
+    flex-grow: 1;
 }

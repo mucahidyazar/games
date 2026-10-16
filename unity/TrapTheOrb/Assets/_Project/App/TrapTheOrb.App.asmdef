@@ -2,7 +2,8 @@
     "name": "TrapTheOrb.App",
     "rootNamespace": "TrapTheOrb.App",
     "references": [
-        "TrapTheOrb.Engine"
+        "TrapTheOrb.Engine",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

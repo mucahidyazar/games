@@ -6,8 +6,8 @@ using UnityEngine;
 namespace TrapTheOrb.App.Platform
 {
     /// <summary>
-    /// Game feedback: the web game's sounds (baked from its Web Audio recipes) plus haptics, both behind the same
-    /// on/off switch (audio/sfx.ts).
+    /// Game feedback: the web game's sounds (baked from its Web Audio recipes, audio/sfx.ts) plus haptics. Each has
+    /// its own switch: <see cref="IsEnabled"/> for sound, <see cref="Haptics.IsEnabled"/> for vibration.
     /// </summary>
     public sealed class SoundPlayer : IFeedback
     {
@@ -30,8 +30,8 @@ namespace TrapTheOrb.App.Platform
 
         public void Play(SoundName name)
         {
-            if (!IsEnabled) return;
             Haptics.Play(name);
+            if (!IsEnabled) return;
             if (clips.TryGetValue(name, out AudioClip clip) && clip != null) source.PlayOneShot(clip);
         }
     }

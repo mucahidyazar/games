@@ -16,6 +16,18 @@ namespace TrapTheOrb.App.UI.Elements
             return With(label, classes);
         }
 
+        /// <summary>A vertical scroll area for touch: no scroll bars, and an elastic edge like the platform's lists.</summary>
+        public static ScrollView Scroll(params string[] classes)
+        {
+            var scroll = new ScrollView(ScrollViewMode.Vertical)
+            {
+                horizontalScrollerVisibility = ScrollerVisibility.Hidden,
+                verticalScrollerVisibility = ScrollerVisibility.Hidden,
+                touchScrollBehavior = ScrollView.TouchScrollBehavior.Elastic,
+            };
+            return With(scroll, classes);
+        }
+
         /// <summary>A tinted vector icon; <paramref name="name"/> selects the image through the "icon--name" class.</summary>
         public static VisualElement Icon(string name, params string[] classes)
         {
@@ -55,6 +67,17 @@ namespace TrapTheOrb.App.UI.Elements
 
         public static void SetVisible(this VisualElement element, bool isVisible) =>
             element.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+
+        /// <summary>Puts <paramref name="gap"/> between the children, since USS has no sibling selectors.</summary>
+        public static T Spaced<T>(this T element, float gap, bool isRow = false) where T : VisualElement
+        {
+            for (int i = 1; i < element.childCount; i++)
+            {
+                if (isRow) element[i].style.marginLeft = gap;
+                else element[i].style.marginTop = gap;
+            }
+            return element;
+        }
 
         /// <summary>Swaps the icon image of an element built by <see cref="Icon"/>.</summary>
         public static void SetIcon(this VisualElement icon, string name)

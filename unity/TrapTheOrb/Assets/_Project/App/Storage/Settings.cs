@@ -4,10 +4,16 @@ using TrapTheOrb.Engine;
 
 namespace TrapTheOrb.App.Storage
 {
-    /// <summary>The player's preferences on this device (storage/settings.ts).</summary>
+    /// <summary>The player's preferences on this device (storage/settings.ts, plus the app's vibration and motion).</summary>
     public sealed record Settings(string Nickname, bool SoundEnabled, GameMode LastMode, CustomSettings Custom)
     {
         public static readonly Settings Default = new Settings(string.Empty, true, GameMode.Classic, Modes.Preset(CustomPreset.Normal));
+
+        /// <summary>Short vibrations for broken walls, cleared levels and game over.</summary>
+        public bool HapticsEnabled { get; init; } = true;
+
+        /// <summary>Drops screen shake, particles and transitions.</summary>
+        public bool ReducedMotion { get; init; }
     }
 
     public static class SettingsStorage
@@ -36,9 +42,13 @@ namespace TrapTheOrb.App.Storage
 
             return new Settings(
                 nickname != null && nickname.Length <= MaxStoredNicknameLength ? SanitizeNickname(nickname) : Settings.Default.Nickname,
-                sound != null && sound.Type == JTokenType.Boolean ? sound.Value<bool>() : Settings.Default.SoundEnabled,
+                Flag(sound, Settings.Default.SoundEnabled),
                 hasMode ? lastMode : Settings.Default.LastMode,
-                custom == null ? Settings.Default.Custom : ParseCustom(custom));
+                custom == null ? Settings.Default.Custom : ParseCustom(custom))
+            {
+                HapticsEnabled = Flag(record["hapticsEnabled"], Settings.Default.HapticsEnabled),
+                ReducedMotion = Flag(record["reducedMotion"], Settings.Default.ReducedMotion),
+            };
         }
 
         public static bool Save(IKeyValueStore store, Settings settings) =>
@@ -48,7 +58,12 @@ namespace TrapTheOrb.App.Storage
                 ["soundEnabled"] = settings.SoundEnabled,
                 ["lastMode"] = settings.LastMode.Id(),
                 ["custom"] = CustomToJson(Modes.SanitizeCustomSettings(settings.Custom)),
+                ["hapticsEnabled"] = settings.HapticsEnabled,
+                ["reducedMotion"] = settings.ReducedMotion,
             });
+
+        private static bool Flag(JToken token, bool fallback) =>
+            token != null && token.Type == JTokenType.Boolean ? token.Value<bool>() : fallback;
 
         /// <summary>Untrusted stored Custom settings, clamped into the allowed ranges.</summary>
         public static CustomSettings ParseCustom(JToken token)

@@ -11,8 +11,8 @@ using PointerType = UnityEngine.UIElements.PointerType;
 namespace TrapTheOrb.App.UI.Screens
 {
     /// <summary>
-    /// The playing field (GameBoard.tsx): draws the game, turns taps and swipes into walls and hosts the overlay
-    /// panels. A tap builds in the current direction; a swipe picks the direction of the wall first.
+    /// The playing field (GameBoard.tsx): draws the game and turns taps and swipes into walls. A tap builds in the
+    /// current direction; a swipe picks the direction of the wall first. It only reacts while a level is played.
     /// </summary>
     public sealed class BoardView : VisualElement
     {
@@ -23,7 +23,6 @@ namespace TrapTheOrb.App.UI.Screens
         private readonly BoardRenderer renderer;
         private readonly VisualElement canvas;
         private readonly PointsLayer points;
-        private readonly VisualElement overlayHost;
         private Gesture? gesture;
         private double now;
         private GameState drawnState;
@@ -41,11 +40,8 @@ namespace TrapTheOrb.App.UI.Screens
             canvas = Ui.Div("board__canvas");
             canvas.generateVisualContent += Draw;
             points = new PointsLayer();
-            overlayHost = Ui.Div("board__overlay-host");
-            overlayHost.pickingMode = PickingMode.Ignore;
             Add(canvas);
             Add(points);
-            Add(overlayHost);
 
             canvas.RegisterCallback<GeometryChangedEvent>(_ => controller.Resize(canvas.contentRect.width, canvas.contentRect.height));
             canvas.RegisterCallback<PointerDownEvent>(OnPointerDown);
@@ -58,12 +54,6 @@ namespace TrapTheOrb.App.UI.Screens
                 if (evt.pointerType == PointerType.mouse) controller.ClearAim();
             });
         }
-
-        /// <summary>Where overlay panels go; they cover the field.</summary>
-        public VisualElement OverlayHost => overlayHost;
-
-        /// <summary>Blurs the field while a panel is shown, like the web's backdrop blur.</summary>
-        public void SetBlurred(bool isBlurred) => canvas.EnableInClassList("board__canvas--blurred", isBlurred);
 
         public void SetPalette(BoardPalette palette)
         {

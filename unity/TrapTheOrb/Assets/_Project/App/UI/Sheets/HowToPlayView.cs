@@ -22,8 +22,7 @@ namespace TrapTheOrb.App.UI.Sheets
             SpeedItem(3, "Blazing", "1.6×");
             Paragraph("Level 1 has a single calm orb. Level 2 adds a second one, level 3 speeds one of them up and level 4 " +
                 "speeds up the other. Then a third orb joins and everyone calms down for a moment — a breather — before " +
-                "they speed up again. Each round starts a little harder than the one before, and the Speed gauge always " +
-                "shows your fastest orb.");
+                "they speed up again. Each round starts a little harder than the one before.");
             Paragraph("You get one life more than there are orbs, and your lives refill at the start of every level.");
 
             Heading("Modes");
@@ -41,7 +40,7 @@ namespace TrapTheOrb.App.UI.Sheets
             Heading("Controls");
             Term("Tap", "Tap a free spot to build a wall in the current direction.");
             Term("Swipe", "Swipe from a free spot to build in the direction of your swipe.");
-            Term("Buttons", "The ↕/↔ button next to Play switches between vertical and horizontal walls.");
+            Term("Direction", "The Vertical and Horizontal switch under the field sets the direction for taps.");
 
             Heading("Rules");
             Bullet("A wall grows in both directions at once from the spot you pick, until each half reaches a wall or the border.");
@@ -62,8 +61,8 @@ namespace TrapTheOrb.App.UI.Sheets
                 "orb, 40 with two, and so on.");
 
             Heading("High scores");
-            Paragraph("Your best runs in the ranked modes are kept on this device — ten per mode. Open <b>High scores</b> " +
-                "from the menu to see them.");
+            Paragraph("Your best runs in the ranked modes are kept on this device — ten per mode. Tap the trophy on the " +
+                "home screen to see them.");
 
             Heading("Tips");
             Bullet("Build right behind an orb that’s moving away from your line. It can’t turn around in time.");
