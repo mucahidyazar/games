@@ -1,5 +1,5 @@
 import { isGameMode, type GameMode } from '@games/trap-the-orb-engine'
-import { isGameId, type GameId } from './games.ts'
+import { gameById, isGameId, type GameId } from './games.ts'
 import type { Site } from './sites.ts'
 
 /** The app's pages. Everything else renders the not-found page. */
@@ -16,6 +16,8 @@ const NOT_FOUND: Route = { page: 'notFound' }
 /** The pages of one game, relative to where the game is mounted. */
 function parseGameRoute(path: string, game: GameId): Route | null {
   if (path === '/') return { page: 'play', game, mode: null }
+  // Only Trap The Orb has leaderboards and modes so far.
+  if (!gameById(game).hasLeaderboards) return null
   if (path === '/leaderboards') return { page: 'leaderboards', game }
   const play = /^\/play\/([A-Za-z]+)$/.exec(path)
   if (play) {

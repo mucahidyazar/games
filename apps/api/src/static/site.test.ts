@@ -9,13 +9,14 @@ const VERCEL_JSON = fileURLToPath(new URL('../../../web/vercel.json', import.met
 describe('isAppRoute', () => {
   it('matches the client-side routes, with or without a trailing slash', () => {
     expect(SPA_ROUTES).toContain('/trap-the-orb')
-    for (const path of ['/', '/leaderboards', '/leaderboards/', '/profile', '/about', '/play/classic', '/play/daily/2026-09-24', '/trap-the-orb', '/trap-the-orb/', '/trap-the-orb/play/classic', '/trap-the-orb/leaderboards']) {
+    expect(SPA_ROUTES).toContain('/absurd-trolley-problems')
+    for (const path of ['/', '/leaderboards', '/leaderboards/', '/profile', '/about', '/play/classic', '/play/daily/2026-09-24', '/trap-the-orb', '/trap-the-orb/', '/trap-the-orb/play/classic', '/trap-the-orb/leaderboards', '/absurd-trolley-problems', '/absurd-trolley-problems/']) {
       expect(isAppRoute(path), path).toBe(true)
     }
   })
 
   it('does not match anything else', () => {
-    for (const path of ['/play', '/play/', '/players', '/leaderboards/week', '/profile/edit', '/index.htm', '/unknown-game', '/trap-the-orb/unknown', '/trap-the-orb/play']) {
+    for (const path of ['/play', '/play/', '/players', '/leaderboards/week', '/profile/edit', '/index.htm', '/unknown-game', '/trap-the-orb/unknown', '/trap-the-orb/play', '/absurd-trolley-problems/leaderboards', '/absurd-trolley-problems/play/classic']) {
       expect(isAppRoute(path), path).toBe(false)
     }
   })

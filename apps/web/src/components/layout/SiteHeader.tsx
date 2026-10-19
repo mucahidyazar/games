@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { CHROME } from '@/app/copy'
+import { useLang } from '@/app/lang'
 import { Link } from '@/app/Link'
 import { navItemsFor, type NavItem } from '@/app/navigation'
 import { NAVIGATE_EVENT } from '@/app/router'
@@ -8,6 +10,7 @@ import { AccountButton } from '@/features/account/AccountButton'
 import { gameById } from '@/sites/games'
 import { routeGame, type Route } from '@/sites/routes'
 import { Brand } from './Brand'
+import { LangToggle } from './LangToggle'
 import { ThemeToggle } from './ThemeToggle'
 
 type SiteHeaderProps = {
@@ -65,6 +68,7 @@ function NavLink({ item, variant, onNavigate, overlay = false }: NavLinkProps) {
 
 /** On the portal: the game that is open, next to the site's brand. */
 function GameCrumb({ route }: { readonly route: Route }) {
+  const lang = useLang()
   const gameId = site.kind === 'game' ? site.game : routeGame(route)
   if (!gameId) return null
   const game = gameById(gameId)
@@ -74,7 +78,7 @@ function GameCrumb({ route }: { readonly route: Route }) {
       <h1 className="sr-only">{game.name}</h1>
       <Link
         href={paths.game(gameId)}
-        aria-label={`${game.name} — play`}
+        aria-label={`${game.name} — ${CHROME.nav.play[lang].toLowerCase()}`}
         title={game.name}
         className="group grid size-9 shrink-0 place-items-center rounded-[11px] bg-[var(--chrome-border)] p-0.5 text-[var(--chrome-fg)] transition hover:scale-105 hover:opacity-85"
       >
@@ -94,8 +98,9 @@ export function SiteHeader({ route, isSticky, showSound, isSoundEnabled, onToggl
   const menuId = useId()
   const menuRef = useRef<HTMLDivElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const lang = useLang()
   const isGameSurface = Boolean(routeGame(route))
-  const items = navItemsFor(site, route, paths).filter((item) => !(isGameSurface && item.label === 'All games'))
+  const items = navItemsFor(site, route, paths, lang).filter((item) => !(isGameSurface && item.id === 'allGames'))
   const isOverlay = route.page === 'home' && site.kind === 'portal'
 
   useEffect(() => {
@@ -138,16 +143,16 @@ export function SiteHeader({ route, isSticky, showSound, isSoundEnabled, onToggl
         <div className="flex min-w-0 shrink-0 items-center gap-4">
           {isGameSurface ? (
             <>
-              <Link href={paths.home()} aria-label={site.kind === 'portal' ? 'All games' : `${site.name} home`} className="inline-flex h-9 items-center gap-1.5 rounded-full px-1.5 text-[0.72rem] font-bold text-[var(--chrome-muted)] transition hover:bg-[var(--chrome-border)] hover:text-[var(--chrome-fg)]">
+              <Link href={paths.home()} aria-label={site.kind === 'portal' ? CHROME.nav.allGames[lang] : `${site.name} ${CHROME.header.homeLabel[lang]}`} className="inline-flex h-9 items-center gap-1.5 rounded-full px-1.5 text-[0.72rem] font-bold text-[var(--chrome-muted)] transition hover:bg-[var(--chrome-border)] hover:text-[var(--chrome-fg)]">
                 <span aria-hidden="true" className="text-base leading-none">←</span>
-                <span className="hidden sm:inline">{site.kind === 'portal' ? 'All games' : 'Home'}</span>
+                <span className="hidden sm:inline">{site.kind === 'portal' ? CHROME.nav.allGames[lang] : CHROME.header.home[lang]}</span>
               </Link>
               <GameCrumb route={route} />
             </>
           ) : (
             <Link
               href={paths.home()}
-              aria-label={site.kind === 'portal' ? 'games.mucahid.dev — home' : `${site.name} — play now`}
+              aria-label={site.kind === 'portal' ? `games.mucahid.dev — ${CHROME.header.homeLabel[lang]}` : `${site.name} — ${CHROME.header.playNow[lang]}`}
               className="block rounded-lg"
             >
               <Brand asHeading={site.kind === 'game'} onDark={isOverlay} />
@@ -155,7 +160,7 @@ export function SiteHeader({ route, isSticky, showSound, isSoundEnabled, onToggl
           )}
         </div>
 
-        <nav aria-label="Main" className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 xl:block">
+        <nav aria-label={CHROME.header.main[lang]} className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 xl:block">
           <ul className="flex items-center gap-1.5">
             {items.map((item) => (
               <li key={item.href}>
@@ -171,12 +176,18 @@ export function SiteHeader({ route, isSticky, showSound, isSoundEnabled, onToggl
               type="button"
               onClick={onToggleSound}
               aria-pressed={isSoundEnabled}
-              aria-label={isSoundEnabled ? 'Mute sound (M)' : 'Turn sound on (M)'}
-              title={isSoundEnabled ? 'Sound on — press M to mute' : 'Sound off — press M to unmute'}
+              aria-label={isSoundEnabled ? CHROME.header.muteSound[lang] : CHROME.header.unmuteSound[lang]}
+              title={isSoundEnabled ? CHROME.header.soundOn[lang] : CHROME.header.soundOff[lang]}
               className={`grid size-9 shrink-0 place-items-center rounded-full text-[var(--chrome-fg)] opacity-80 transition duration-200 hover:opacity-100 active:scale-95 ${isOverlay ? 'bg-white/10 text-white' : 'bg-[var(--chrome-border)]'}`}
             >
               {isSoundEnabled ? <VolumeOnIcon className="size-[18px]" /> : <VolumeOffIcon className="size-[18px]" />}
             </button>
+          )}
+          {/* The narrowest phones find it in the menu instead. */}
+          {isOverlay && (
+            <div className="hidden min-[360px]:block">
+              <LangToggle onDark />
+            </div>
           )}
           <ThemeToggle onDark={isOverlay} />
           <AccountButton />
@@ -186,7 +197,7 @@ export function SiteHeader({ route, isSticky, showSound, isSoundEnabled, onToggl
             onClick={() => setIsMenuOpen((open) => !open)}
             aria-expanded={isMenuOpen}
             aria-controls={menuId}
-            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={isMenuOpen ? CHROME.header.closeMenu[lang] : CHROME.header.openMenu[lang]}
             className={`grid size-10 shrink-0 place-items-center rounded-full opacity-80 transition hover:opacity-100 xl:hidden ${isOverlay ? 'text-white hover:bg-white/10' : 'text-[var(--chrome-fg)] hover:bg-[var(--chrome-border)]'}`}
           >
             {isMenuOpen ? <CloseIcon className="size-5" /> : <MenuIcon className="size-5" />}
@@ -195,7 +206,7 @@ export function SiteHeader({ route, isSticky, showSound, isSoundEnabled, onToggl
 
         <nav
           id={menuId}
-          aria-label="Main"
+          aria-label={CHROME.header.main[lang]}
           hidden={!isMenuOpen}
           className={`absolute inset-x-0 top-full origin-top animate-pop px-3 pt-2 pb-3 shadow-lift xl:hidden ${isOverlay ? 'border-t border-white/10 bg-[#0b1630]/95 text-white backdrop-blur-xl' : 'border-t border-[var(--chrome-border)] bg-[var(--chrome-bg)]'}`}
         >
@@ -206,6 +217,11 @@ export function SiteHeader({ route, isSticky, showSound, isSoundEnabled, onToggl
               </li>
             ))}
           </ul>
+          {isOverlay && (
+            <div className="mt-2 flex justify-end px-1 min-[360px]:hidden">
+              <LangToggle onDark />
+            </div>
+          )}
         </nav>
       </div>
     </header>

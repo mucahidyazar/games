@@ -8,9 +8,11 @@ import { GameControllerProvider } from '@/games/trap-the-orb/state/GameControlle
 import { PlayerDataProvider } from '@/games/trap-the-orb/state/PlayerDataProvider'
 import { logger } from './lib/logger'
 import './index.css'
+import { initializeLang } from './app/lang'
 import { initializeTheme } from './app/theme'
 
 initializeTheme()
+initializeLang()
 
 const container = document.getElementById('root')
 if (!container) throw new Error('Root element #root is missing from index.html')

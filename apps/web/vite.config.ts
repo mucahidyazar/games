@@ -54,6 +54,9 @@ export default defineConfig(({ mode }) => {
           "src/test/**",
           "src/main.tsx",
           "src/env.d.ts",
+          // WebGL needs a GPU, which jsdom lacks: e2e/trolley.spec.ts plays these in real browsers.
+          "src/games/absurd-trolley-problems/scene/TrolleyScene.ts",
+          "src/games/absurd-trolley-problems/scene/pixelPipeline.ts",
         ],
         reporter: ["text-summary", "text", "html"],
         thresholds: { statements: 80, branches: 80, functions: 80, lines: 80 },

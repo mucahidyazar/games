@@ -56,4 +56,12 @@ describe('site paths and routes', () => {
     expect(routeGame(parseRoute('/trap-the-orb', PORTAL))).toBe('trap-the-orb')
     expect(routeGame(parseRoute('/', PORTAL))).toBeNull()
   })
+
+  it('mounts Absurd Trolley Problems on the portal with no leaderboards or modes', () => {
+    expect(parseRoute('/absurd-trolley-problems', PORTAL)).toEqual({ page: 'play', game: 'absurd-trolley-problems', mode: null })
+    expect(parseRoute('/absurd-trolley-problems/', PORTAL)).toEqual({ page: 'play', game: 'absurd-trolley-problems', mode: null })
+    expect(parseRoute('/absurd-trolley-problems/leaderboards', PORTAL)).toEqual({ page: 'notFound' })
+    expect(parseRoute('/absurd-trolley-problems/play/classic', PORTAL)).toEqual({ page: 'notFound' })
+    expect(createPaths(PORTAL).game('absurd-trolley-problems')).toBe('/absurd-trolley-problems')
+  })
 })

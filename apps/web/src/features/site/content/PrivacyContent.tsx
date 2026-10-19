@@ -15,7 +15,7 @@ export function PrivacyContent({ contactEmail = siteConfig.contactEmail }: Priva
   return (
     <>
       <p>
-        <strong>Effective September 30, 2026</strong>
+        <strong>Effective October 18, 2026</strong>
       </p>
 
       <h3>Overview</h3>
@@ -55,8 +55,16 @@ export function PrivacyContent({ contactEmail = siteConfig.contactEmail }: Priva
         your profile, runs, records and badges from our database.
       </p>
 
+      <h3>Absurd Trolley Problems votes</h3>
+      <p>
+        When you make a choice in Absurd Trolley Problems, we store an anonymous vote: the dilemma, your choice and a
+        random identifier your browser created for the player who made it. The identifier keeps one vote per dilemma per
+        player; it is not linked to the player’s name, your account, your email address or your IP address. Only the
+        totals are ever shown.
+      </p>
+
       <h3>Data stored on your device</h3>
-      <p>The game keeps a few things in your browser’s local storage so it can remember them between visits:</p>
+      <p>The games keep a few things in your browser’s local storage so they can remember them between visits:</p>
       <ul>
         <li>
           <strong>Settings</strong>: your sound preference, the last mode you played, your Custom setup and the name
@@ -68,11 +76,17 @@ export function PrivacyContent({ contactEmail = siteConfig.contactEmail }: Priva
         <li>
           <strong>Unfinished practice game</strong>: the level and score to continue from.
         </li>
+        <li>
+          <strong>Absurd Trolley Problems players</strong>: the names and colours you give each player on this device,
+          each player’s choices, chapter and place in Philippa Foot’s cases, their anonymous voting identifiers, and your
+          music setting. Names never leave your device.
+        </li>
         <li><strong>Your analytics consent choice.</strong></li>
       </ul>
       <p>
-        This data stays on your device and is never sent to our servers. To delete guest scores, use “Clear device
-        scores” on the leaderboards page. To remove everything, clear this site’s data in your browser.
+        Apart from the voting identifier sent with each anonymous vote, this data stays on your device and is never
+        sent to our servers. To delete guest scores, use “Clear device scores” on the leaderboards page. To remove
+        everything, clear this site’s data in your browser.
       </p>
 
       <h3>Optional analytics</h3>

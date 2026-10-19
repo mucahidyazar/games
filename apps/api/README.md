@@ -6,6 +6,7 @@ The server behind Trap The Orb, and later the other games: accounts (Google and 
 - [Better Auth](https://better-auth.com) 1.7: Google sign-in and the email OTP plugin, stored through the Drizzle adapter
 - [Drizzle ORM](https://orm.drizzle.team) on Postgres (`postgres.js`); [PGlite](https://pglite.dev) (Postgres compiled to WASM) for development and tests
 - Request and response shapes come from `@games/contract`; scores are recomputed by replaying runs with `@games/trap-the-orb-engine`
+- Absurd Trolley Problems' community votes: one anonymous vote per device and dilemma
 
 ## Run it locally
 
@@ -109,6 +110,8 @@ Every error is `{ "error": { "code", "message" } }`; the codes are listed in `AP
 | `POST /api/runs` | session + nickname | Starts a ranked run; the server picks the seed. `201`. `409 nickname_required` without a nickname. 20 per minute. |
 | `POST /api/runs/:id/finish` | session | Replays the recording and returns the authoritative result, new badges and leaderboard standings. 20 per minute, 256 KB body limit. |
 | `GET /api/leaderboards?board&period&date` | optional | Top 50 plus the signed-in player's own rank (`me`). 120 per minute per address. |
+| `GET /api/trolley/tallies` | – | Absurd Trolley Problems: pull and stay counts for every dilemma, and every one of Philippa Foot's cases, that has votes. 60 per minute per address. |
+| `POST /api/trolley/votes` | – | `{ dilemmaId, choice, voterId }`, where `voterId` is a random UUID the browser keeps; voting again replaces that device's earlier choice. Returns the dilemma's new tally. 60 per minute per address. |
 
 How a ranked run is scored:
 
@@ -122,10 +125,11 @@ Other protections: every non-GET `/api/*` request outside `/api/auth` must carry
 
 ## Database and migrations
 
-Two Postgres schemas:
+Three Postgres schemas:
 
 - `core`, shared by every game: Better Auth's `user`, `session`, `account` and `verification`, plus `profile` (nickname, unique regardless of case).
 - `traptheorb`: `run` (seed, recording summary, server result, client claims), `record` (a player's best per leaderboard table) and `badge` (highest tier per badge).
+- `absurdtrolley`: `vote` (one row per dilemma and anonymous voter id, holding their choice). It stores no account or address.
 
 Deleting a user cascades to everything they own. The schema is in `src/db/schema/`; migrations are in `drizzle/`. Applied migrations are journaled in `drizzle.__games_api_migrations`, separate from any other Drizzle project in the same database.
 
@@ -170,6 +174,7 @@ src/
 ├── me/ profile/       /api/me, nicknames, profanity filter, daily streak
 ├── runs/              Start/finish, replay verification, badges and records
 ├── leaderboards/      Tables, ranking, /api/leaderboards
+├── trolley/           Absurd Trolley Problems' votes and tallies
 ├── static/            Serving the built site (production)
 └── system/            /api/health and /api/config
 test/                  Integration tests through app.request() on in-memory PGlite

@@ -10,7 +10,7 @@ export default defineConfig({
   dialect: 'postgresql',
   schema: './src/db/schema/index.ts',
   out: './drizzle',
-  schemaFilter: ['core', 'traptheorb'],
+  schemaFilter: ['core', 'traptheorb', 'absurdtrolley'],
   migrations: { schema: MIGRATIONS_SCHEMA, table: MIGRATIONS_TABLE },
   strict: true,
   verbose: true,

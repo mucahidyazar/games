@@ -127,13 +127,15 @@ describe('buildSitemapXml', () => {
     expect(xml).toContain('<priority>1.0</priority>')
   })
 
-  it('lists the portal home, game landing page and game leaderboard', () => {
+  it('lists the portal home, each game landing page and the leaderboards a game has', () => {
     const xml = buildSitemapXml(PORTAL.url, BUILD_DATE)
-    expect(xml.match(/<url>/g)).toHaveLength(4)
+    expect(xml.match(/<url>/g)).toHaveLength(5)
     expect(xml).toContain('<loc>https://games.mucahid.dev/</loc>')
     expect(xml).toContain('<loc>https://games.mucahid.dev/about</loc>')
     expect(xml).toContain('<loc>https://games.mucahid.dev/trap-the-orb</loc>')
     expect(xml).toContain('<loc>https://games.mucahid.dev/trap-the-orb/leaderboards</loc>')
+    expect(xml).toContain('<loc>https://games.mucahid.dev/absurd-trolley-problems</loc>')
+    expect(xml).not.toContain('/absurd-trolley-problems/leaderboards')
     expect(xml).not.toContain('/play/')
     expect(xml).not.toContain('/profile')
   })

@@ -108,6 +108,9 @@ export interface RateLimitSettings {
   readonly runFinish: RateLimitRule
   readonly profile: RateLimitRule
   readonly leaderboards: RateLimitRule
+  /** Absurd Trolley Problems: reading the community tallies and voting, per client address. */
+  readonly trolleyTallies: RateLimitRule
+  readonly trolleyVotes: RateLimitRule
   /** Login-code emails per email address (Better Auth separately limits per client address). */
   readonly otpEmail: RateLimitRule
 }
@@ -120,5 +123,8 @@ export const DEFAULT_RATE_LIMITS: RateLimitSettings = {
   runFinish: { limit: 20, windowMs: MINUTE_MS },
   profile: { limit: 10, windowMs: MINUTE_MS },
   leaderboards: { limit: 120, windowMs: MINUTE_MS },
+  trolleyTallies: { limit: 60, windowMs: MINUTE_MS },
+  // A whole chapter takes a few minutes; this leaves room for a household sharing an address.
+  trolleyVotes: { limit: 60, windowMs: MINUTE_MS },
   otpEmail: { limit: 5, windowMs: HOUR_MS },
 }

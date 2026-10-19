@@ -1,7 +1,9 @@
+import { useLang } from '@/app/lang'
 import { Link } from '@/app/Link'
 import { paths } from '@/app/site'
 import { PlayIcon } from '@/components/icons'
 import type { GameEntry } from '@/sites/games'
+import { PORTAL_COPY as COPY } from './portalCopy'
 import { useTilt } from './useTilt'
 
 type GameCardProps = {
@@ -20,11 +22,13 @@ const TAG_CLASS = 'rounded-full bg-sunken px-2 py-0.5 text-[0.66rem] font-bold t
  */
 export function GameCard({ game, isFeatured = false, delayMs = 0 }: GameCardProps) {
   const tilt = useTilt()
+  const lang = useLang()
+  const copy = lang === 'tr' ? game.tr : game
 
   return (
     <Link
       href={paths.game(game.id)}
-      aria-label={`Play ${game.name}`}
+      aria-label={COPY.card.play(game.name)[lang]}
       className="group block animate-rise rounded-[18px] outline-none focus-visible:ring-4 focus-visible:ring-teal-400/60 motion-reduce:animate-none"
       style={{ animationDelay: `${delayMs}ms` }}
     >
@@ -53,7 +57,7 @@ export function GameCard({ game, isFeatured = false, delayMs = 0 }: GameCardProp
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-surface via-surface/45 to-transparent" />
           {isFeatured && (
             <span className="absolute top-3 left-3 rounded-full bg-coral-600 px-2.5 py-1 text-[0.62rem] font-bold tracking-[0.12em] text-white uppercase shadow-coral">
-              Featured
+              {COPY.card.featured[lang]}
             </span>
           )}
           <span
@@ -65,7 +69,7 @@ export function GameCard({ game, isFeatured = false, delayMs = 0 }: GameCardProp
         </div>
         <div className={`relative ${isFeatured ? 'px-5 pt-4 pb-5' : 'px-4 pt-3.5 pb-4'}`}>
           <div className="flex flex-wrap items-center gap-1.5">
-            {game.tags.map((tag) => (
+            {copy.tags.map((tag) => (
               <span key={tag} className={TAG_CLASS}>
                 {tag}
               </span>
@@ -74,10 +78,10 @@ export function GameCard({ game, isFeatured = false, delayMs = 0 }: GameCardProp
           <h3 className={`mt-2 font-extrabold tracking-[-0.02em] text-ink ${isFeatured ? 'text-[1.5rem]' : 'text-[1.1rem]'}`}>
             {game.name}
           </h3>
-          <p className={`mt-1 text-muted ${isFeatured ? 'text-[0.95rem]' : 'text-[0.84rem]'}`}>{game.tagline}</p>
+          <p className={`mt-1 text-muted ${isFeatured ? 'text-[0.95rem]' : 'text-[0.84rem]'}`}>{copy.tagline}</p>
           {isFeatured && (
             <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[0.8rem] font-semibold text-accent">
-              {game.highlights.map((highlight) => (
+              {copy.highlights.map((highlight) => (
                 <li key={highlight} className="inline-flex items-center gap-1.5">
                   <span aria-hidden="true" className="size-1.5 rounded-full bg-teal-400" />
                   {highlight}

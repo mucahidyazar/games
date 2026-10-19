@@ -10,8 +10,9 @@ export const SPA_ROUTES = [
   '/', '/profile', '/about',
   // The game on its own domain.
   '/leaderboards', '/play/*',
-  // The same game mounted inside the portal. Keep in sync with the web game catalogue.
+  // The games mounted inside the portal. Keep in sync with the web game catalogue.
   '/trap-the-orb', '/trap-the-orb/leaderboards', '/trap-the-orb/play/*',
+  '/absurd-trolley-problems',
 ] as const
 
 export const CACHE_IMMUTABLE = 'public, max-age=31536000, immutable'

@@ -51,6 +51,28 @@ describe('navigation helpers', () => {
   })
 })
 
+describe('a game without leaderboards or apps', () => {
+  const trolley: Route = { page: 'play', game: 'absurd-trolley-problems', mode: null }
+
+  it('links only to its game page and how to play', () => {
+    expect(labels(navItemsFor(PORTAL, trolley, portalPaths))).toEqual(['All games', 'Play', 'How to play'])
+    const footer = footerColumnsFor(PORTAL, trolley, portalPaths)
+    expect(footer[0]?.links.map((link) => link.href)).toEqual(['/', '/absurd-trolley-problems', '#how-to-play'])
+  })
+})
+
+describe('localized navigation', () => {
+  it('speaks Turkish when the site does, keeping ids and links', () => {
+    const items = navItemsFor(PORTAL, portalHome, portalPaths, 'tr')
+    expect(labels(items)).toEqual(['Oyunlar', 'Kategoriler', 'Hakkında'])
+    expect(items.map((item) => item.id)).toEqual(['games', 'categories', 'about'])
+    const footer = footerColumnsFor(gameSite, gameAbout, gamePaths, 'tr')
+    expect(footer.map((column) => column.title)).toEqual(['Oyna', 'Site'])
+    expect(footer[0]?.links.find((link) => link.id === 'mobileApp')?.badge).toBe('Yakında')
+    expect(navItemsFor(gameSite, gameAbout, gamePaths, 'tr').find((item) => item.id === 'moreGames')?.label).toBe('Daha fazla oyun')
+  })
+})
+
 describe('dialog hash parsing', () => {
   it('accepts supported dialog hashes and ignores the legacy About hash', () => {
     expect(dialogFromHash('#privacy')).toBe('privacy')

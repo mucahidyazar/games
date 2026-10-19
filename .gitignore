@@ -38,3 +38,6 @@ apps/api/.data/
 
 # Meshy downloads that were not saved straight into a Unity project
 meshy_output/
+
+# Python bytecode from running the Blender build scripts
+__pycache__/

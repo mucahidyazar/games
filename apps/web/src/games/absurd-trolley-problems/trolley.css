@@ -1,0 +1,3463 @@
+/*
+ * Absurd Trolley Problems. The game is a night scene, so its panel keeps the
+ * key frame's navy palette in both site themes: in the dark theme it blends
+ * into the page, in the light theme it sits on it as a dark game screen.
+ */
+
+.atp,
+.atp-header {
+  --atp-cream: #fbefd6;
+  --atp-text: #c8d1df;
+  --atp-muted: #8f9cb3;
+  --atp-mint: #7fe3b8;
+  --atp-mint-hi: #8cf5bf;
+  --atp-mint-bar: #5af2af;
+  --atp-line: #2c4166;
+  --atp-line-strong: #3a5278;
+  --atp-panel: #10203d;
+  --atp-segment: #1c3553;
+  --atp-font-pixel: 'Rubik Variable', 'Rubik', system-ui, sans-serif;
+  --atp-font-block: 'Silkscreen', ui-monospace, monospace;
+  /* Philippa Foot's problems: the system's book face, nothing to download. */
+  --atp-font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  color: var(--atp-text);
+}
+
+.atp {
+  position: relative;
+  isolation: isolate;
+}
+
+:root[data-theme='light'] .atp {
+  padding: 18px 22px 24px;
+  border-radius: 26px;
+  background: #0b1630;
+  box-shadow: 0 30px 60px -36px rgb(15 37 72 / 0.55);
+}
+
+.atp [hidden] {
+  display: none !important;
+}
+
+/* Pixel text is a tiny canvas blown up by whole device pixels: no smoothing. */
+.atp-pixel-canvas {
+  display: block;
+  margin-inline: auto;
+  image-rendering: pixelated;
+}
+
+/* --------------------------------------------------------------- header */
+/* The game's own site header: All games, the logo, the tabs centred on the
+   page, then the game's and the site's controls. */
+
+.atp-header {
+  position: relative;
+}
+
+:root[data-theme='light'] .atp-header {
+  background: #0b1630;
+}
+
+.atp-header-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  grid-template-areas: 'back brand . tools account';
+  align-items: center;
+  gap: 8px 12px;
+  min-height: 4.25rem;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 8px 16px;
+}
+
+@media (min-width: 640px) {
+  .atp-header-inner {
+    padding-inline: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .atp-header-inner {
+    padding-inline: 32px;
+  }
+}
+
+.atp-back {
+  grid-area: back;
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px 0 9px;
+  border: 2px solid var(--atp-line);
+  border-radius: 9px;
+  color: #c3cfe0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: border-color 160ms, color 160ms;
+}
+
+.atp-back:hover {
+  border-color: var(--atp-mint);
+  color: #ffffff;
+}
+
+.atp-back-arrow {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.atp-brand {
+  grid-area: brand;
+  margin: 0;
+}
+
+.atp-brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Both lines are trimmed to their pixels, so this gap is the whole gap. */
+.atp-brand-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.atp-brand-top {
+  font-size: 2rem;
+  line-height: 0;
+}
+
+.atp-brand-bottom {
+  font-size: 0.875rem;
+  line-height: 0;
+}
+
+.atp-brand-twinkle {
+  width: 12px;
+  height: 12px;
+  opacity: 0.85;
+}
+
+.atp-brand-sparkle {
+  align-self: flex-start;
+  width: 13px;
+  height: 13px;
+  margin-top: 6px;
+  opacity: 0.9;
+  animation: atp-twinkle 2.8s ease-in-out infinite;
+}
+
+.atp-header .atp-tabs {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%);
+}
+
+.atp-header-tools {
+  grid-area: tools;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.atp-header-account {
+  grid-area: account;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.atp-signin {
+  display: inline-flex;
+  height: 32px;
+  min-width: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 2px solid #2f9c70;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #84f0c0 0%, #5cdba3 100%);
+  box-shadow: 0 2px 0 #258560, inset 0 2px 0 rgb(255 255 255 / 0.35);
+  color: #0d2a1e;
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: transform 110ms ease-out, box-shadow 110ms ease-out;
+}
+
+.atp-signin:hover {
+  transform: translateY(-1px);
+}
+
+.atp-signin:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #258560;
+}
+
+.atp-signin.is-loading {
+  width: 84px;
+  border-color: var(--atp-line);
+  background: var(--atp-panel);
+  box-shadow: none;
+}
+
+.atp-profile {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px 0 2px;
+  border: 2px solid var(--atp-line);
+  border-radius: 9px;
+  color: var(--atp-cream);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: border-color 160ms;
+}
+
+.atp-profile:hover {
+  border-color: var(--atp-mint);
+}
+
+.atp-profile > span:last-child {
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.atp-tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.atp-tab {
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: var(--atp-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color 160ms, background-color 160ms;
+}
+
+.atp-tab:hover {
+  color: #e8eef8;
+}
+
+.atp-tab[aria-selected='true'] {
+  background: rgb(95 219 167 / 0.12);
+  color: var(--atp-mint-hi);
+}
+
+.atp-icon-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 2px solid var(--atp-line);
+  border-radius: 9px;
+  color: var(--atp-mint);
+  transition: border-color 160ms, color 160ms;
+}
+
+.atp-icon-button:hover {
+  border-color: var(--atp-mint);
+}
+
+.atp-icon-button[aria-pressed='false'] {
+  color: var(--atp-muted);
+}
+
+.atp-note {
+  width: 18px;
+  height: 18px;
+}
+
+.atp-lang {
+  display: flex;
+  height: 32px;
+  overflow: hidden;
+  border: 2px solid var(--atp-line);
+  border-radius: 9px;
+}
+
+.atp-lang-button {
+  padding: 0 8px;
+  color: var(--atp-muted);
+  font-family: var(--atp-font-block);
+  font-size: 0.72rem;
+  line-height: 1.1;
+  transition: background-color 160ms, color 160ms;
+}
+
+.atp-lang-button[aria-pressed='true'] {
+  background: rgb(95 219 167 / 0.14);
+  color: var(--atp-mint-hi);
+}
+
+.atp-counter {
+  margin: 0 4px 0 0;
+  color: var(--atp-cream);
+  font-family: var(--atp-font-block);
+  font-size: 1.125rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.atp-counter-current {
+  color: var(--atp-mint-hi);
+}
+
+/* -------------------------------------------------------------- play */
+/* One column; the community dock and the next button share the stage's cell,
+   so they sit over the scene without being taken out of the flow. */
+
+.atp-play {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'heading' 'stage' 'choices' 'hint';
+}
+
+/* ------------------------------------------------------------ heading */
+
+.atp-heading {
+  grid-area: heading;
+  margin-top: clamp(2px, 0.5vw, 8px);
+  text-align: center;
+}
+
+.atp-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.2vw, 17px);
+  margin: 0 auto;
+  max-width: 1200px;
+  color: var(--atp-cream);
+  font-family: var(--atp-font-pixel);
+  font-size: clamp(0.8rem, 1.85vw, 1.95rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+}
+
+.atp-title-text {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.atp-title-sparkle {
+  width: clamp(9px, 0.8vw, 12px);
+  height: clamp(9px, 0.8vw, 12px);
+  animation: atp-twinkle 3.2s ease-in-out infinite;
+}
+
+.atp-title-sparkle.is-left {
+  align-self: flex-end;
+  margin-bottom: 0.15em;
+}
+
+.atp-title-sparkle.is-right {
+  align-self: flex-start;
+  margin-top: 0.1em;
+  animation-delay: -1.4s;
+}
+
+.atp-setup {
+  margin: 4px auto 0;
+  max-width: 70ch;
+  color: #c3cbd9;
+  font-size: clamp(0.75rem, 0.73vw, 0.875rem);
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+/* Why nobody is counted, under the cases of the abortion debate. */
+.atp-setup-note {
+  margin: 4px auto 0;
+  max-width: 70ch;
+  color: var(--atp-muted);
+  font-size: clamp(0.72rem, 0.7vw, 0.8rem);
+  font-style: italic;
+  text-wrap: balance;
+}
+
+/* -------------------------------------------------------------- stage */
+
+.atp-stage-wrap {
+  grid-area: stage;
+  position: relative;
+  margin-top: clamp(10px, 1.2vw, 16px);
+}
+
+/* At least 60% of the screen's height; the camera widens its view to keep the tracks in frame. */
+.atp-stage {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: max(60svh, 240px);
+  border: 3px solid #2b4774;
+  border-radius: 18px;
+  background: #0a1730;
+  box-shadow: 0 0 0 2px #081227, 0 0 44px -12px rgb(88 140 255 / 0.4), inset 0 0 0 1px rgb(255 255 255 / 0.05);
+}
+
+.atp-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  /* Sideways drags move the lever; up and down still scroll the page. */
+  touch-action: pan-y pinch-zoom;
+}
+
+.atp-stage-note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  color: var(--atp-text);
+  font-family: var(--atp-font-pixel);
+  font-size: 1.1rem;
+  text-align: center;
+  background: radial-gradient(ellipse at center, #13254a 0%, #0a1730 70%);
+}
+
+.atp-stage-note.is-error {
+  color: #ffd36b;
+}
+
+.atp-loader {
+  width: 18px;
+  height: 18px;
+  background: var(--atp-mint);
+  box-shadow: 24px 0 0 #3a5278, 48px 0 0 #3a5278;
+  transform: translateX(-24px);
+  animation: atp-loader 0.9s steps(3) infinite;
+}
+
+.atp-stage-dim {
+  position: absolute;
+  inset: 0;
+  background: rgb(6 13 30 / 0.55);
+}
+
+.atp-stage-dim.is-deep {
+  background: rgb(6 13 30 / 0.72);
+}
+
+/* ------------------------------------------------------- start screen */
+/* Who's playing: everyone's game on this device, and a new one. */
+
+.atp-start {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  /* As wide as its cards (set by --columns), never wider than the stage. */
+  width: min(calc(var(--columns, 3) * 236px + (var(--columns, 3) - 1) * 12px + 40px), 94%);
+  height: fit-content;
+  max-height: 94%;
+  margin: auto;
+  overflow: auto;
+  padding: 12px 17px 17px;
+  border: 3px solid #3d5d8c;
+  border-radius: 16px;
+  background: rgb(8 17 36 / 0.95);
+  box-shadow: 0 10px 0 rgb(0 0 0 / 0.35);
+  animation: atp-pop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* The way back to the problems, which ones these are, and the panel's own buttons. */
+.atp-start-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.atp-start-back .atp-arrow {
+  transform: scaleX(-1);
+}
+
+.atp-start-label {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Who is about to choose the problems: a small avatar and their name. */
+.atp-start-who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--atp-cream);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.atp-start-who .atp-avatar {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.atp-start-who span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* A square icon button: closing the panel, deleting a player. */
+.atp-square-button {
+  display: grid;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  border: 2px solid var(--atp-line);
+  border-radius: 9px;
+  color: var(--atp-muted);
+  transition: border-color 160ms, color 160ms;
+}
+
+.atp-square-button:hover {
+  border-color: var(--atp-mint);
+  color: var(--atp-cream);
+}
+
+.atp-square-button.is-small {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.atp-square-button.is-danger:hover {
+  border-color: #ff8f7a;
+  color: #ffa594;
+}
+
+.atp-close-icon {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.atp-square-button.is-small .atp-close-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Cards of one size: as wide as the panel allows, as tall as the tallest. */
+.atp-players {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  grid-auto-rows: 1fr;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The new game's form is taller than a card; it gets its own height. */
+.atp-players:has(.atp-new-player) {
+  grid-auto-rows: auto;
+}
+
+.atp-player {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'avatar text'
+    'actions actions';
+  align-items: center;
+  gap: 14px 12px;
+  padding: 14px 12px 12px;
+  border: 2px solid #26406a;
+  border-radius: 12px;
+  background: var(--atp-panel);
+}
+
+.atp-player.is-last {
+  border-color: #3f8f72;
+}
+
+.atp-player.is-new {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: none;
+}
+
+.atp-player.is-new:has(.atp-new-button) {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.atp-avatar {
+  grid-area: avatar;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--player);
+  box-shadow: inset 0 -4px 0 rgb(0 0 0 / 0.22), inset 0 3px 0 rgb(255 255 255 / 0.25);
+  color: #0b1630;
+  font-family: var(--atp-font-block);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.atp-player-text {
+  grid-area: text;
+  min-width: 0;
+}
+
+.atp-player-name {
+  margin: 0;
+  overflow: hidden;
+  color: var(--atp-cream);
+  font-size: 1.02rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.atp-player-stats {
+  margin: 3px 0 0;
+  color: var(--atp-muted);
+  font-size: 0.76rem;
+}
+
+/* A tab on the card's top edge, so the last player's card is no taller than the rest. */
+.atp-player-tag {
+  position: absolute;
+  top: -9px;
+  right: 12px;
+  margin: 0;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #3f8f72;
+  color: #e9fff4;
+  font-family: var(--atp-font-block);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
+}
+
+.atp-player-actions {
+  grid-area: actions;
+  align-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.atp-player-confirm {
+  grid-area: actions;
+  align-self: end;
+}
+
+.atp-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.atp-player-confirm p {
+  margin: 0 0 8px;
+  color: #ffd6cc;
+  font-size: 0.8rem;
+}
+
+.atp-player-play,
+.atp-start-button {
+  display: inline-flex;
+  height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 2px solid #2f9c70;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #84f0c0 0%, #5cdba3 100%);
+  box-shadow: 0 2px 0 #258560, inset 0 2px 0 rgb(255 255 255 / 0.35);
+  color: #0d2a1e;
+  font-size: 0.86rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.atp-player-play .atp-arrow,
+.atp-start-button .atp-arrow {
+  width: 12px;
+  height: auto;
+}
+
+.atp-player-play:active,
+.atp-start-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 #258560;
+}
+
+.atp-new-button {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 132px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  border: 2px dashed var(--atp-line-strong);
+  border-radius: 12px;
+  color: var(--atp-mint-hi);
+  text-align: center;
+  transition: border-color 160ms, background-color 160ms;
+}
+
+.atp-new-button:enabled:hover {
+  border-color: var(--atp-mint);
+  background: rgb(95 219 167 / 0.06);
+}
+
+.atp-new-button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* An empty avatar with a plus in it. */
+.atp-new-plus {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  margin-bottom: 2px;
+  border: 2px dashed currentColor;
+  border-radius: 10px;
+}
+
+.atp-new-plus svg {
+  width: 14px;
+  height: 14px;
+}
+
+.atp-new-label {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.atp-new-note {
+  max-width: 24ch;
+  color: var(--atp-muted);
+  font-size: 0.74rem;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.atp-new-player {
+  display: grid;
+  gap: 10px;
+}
+
+.atp-new-title {
+  margin: 0;
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.atp-new-setup {
+  margin: 0;
+  color: var(--atp-muted);
+  font-size: 0.8rem;
+}
+
+.atp-field {
+  display: grid;
+  gap: 5px;
+  color: var(--atp-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.atp-field input,
+.atp-field select {
+  height: 38px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 9px;
+  background: #0c1a33;
+  color: var(--atp-cream);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.atp-field input:focus,
+.atp-field select:focus {
+  border-color: var(--atp-mint);
+}
+
+.atp-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.atp-swatches legend {
+  width: 100%;
+  margin-bottom: 6px;
+  color: var(--atp-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.atp-swatch {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--swatch);
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.22);
+  cursor: pointer;
+}
+
+.atp-swatch input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.atp-swatch:has(input:checked) {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.atp-swatch:has(input:focus-visible) {
+  outline: 3px solid var(--atp-mint-hi);
+  outline-offset: 2px;
+}
+
+.atp-form-error {
+  margin: 0;
+  color: #ffa594;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------- the two sets */
+/* Philippa Foot's original problems, or the absurd ones: two tiles, side by side. */
+
+.atp-start.atp-modes {
+  width: min(700px, 94%);
+  padding: 16px;
+}
+
+.atp-mode-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atp-mode-list > li {
+  display: flex;
+}
+
+.atp-mode {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 14px 14px 14px;
+  border: 2px solid #26406a;
+  border-radius: 14px;
+  background: var(--atp-panel);
+  color: var(--atp-text);
+  text-align: left;
+  transition: border-color 160ms, transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms;
+}
+
+.atp-mode:hover {
+  border-color: var(--atp-mint);
+  box-shadow: 0 6px 0 rgb(0 0 0 / 0.25);
+  transform: translateY(-3px);
+}
+
+.atp-mode:active {
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+.atp-mode-art {
+  display: block;
+  width: 100%;
+  height: 76px;
+  margin-bottom: 6px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: radial-gradient(ellipse at 30% 0%, #1b3566 0%, #0c1a33 70%);
+}
+
+.atp-mode-kicker {
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Foot's tile speaks in smooth type, the way her problems are drawn (and keeps her name's dotless I). */
+.atp-mode.is-foot .atp-mode-kicker {
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: none;
+}
+
+.atp-mode-name {
+  color: var(--atp-cream);
+  font-size: 1.14rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.atp-mode.is-foot .atp-mode-name {
+  font-family: var(--atp-font-serif);
+  font-size: 1.28rem;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.atp-mode-text {
+  color: var(--atp-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.atp-mode-foot {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 10px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.atp-mode-meta {
+  color: var(--atp-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.atp-mode-go {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 2px solid #2f9c70;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #84f0c0 0%, #5cdba3 100%);
+  box-shadow: 0 2px 0 #258560, inset 0 2px 0 rgb(255 255 255 / 0.35);
+  color: #0d2a1e;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.atp-mode-go .atp-arrow {
+  width: 12px;
+  height: auto;
+}
+
+.atp-quip {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  z-index: 2;
+  max-width: min(600px, 58%);
+  margin: 0;
+  padding: 10px 14px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 10px;
+  background: rgb(8 17 36 / 0.88);
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.3);
+  color: #f3ead6;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  line-height: 1.4;
+  animation: atp-pop 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.atp-quip-you {
+  color: var(--atp-mint-hi);
+  font-weight: 700;
+}
+
+.atp-fact {
+  padding: 10px 14px;
+  border: 2px solid #34507a;
+  border-radius: 10px;
+  background: rgb(8 17 36 / 0.88);
+  color: var(--atp-text);
+  font-size: clamp(0.76rem, 0.9vw, 0.84rem);
+  line-height: 1.45;
+  animation: atp-pop 420ms 120ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.atp-fact-label {
+  margin: 0 0 4px;
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+}
+
+.atp-fact-text {
+  margin: 0;
+}
+
+.atp-fact-source {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--atp-mint-hi);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.atp-hud {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Whose game is on; it brings back "who's playing?". */
+.atp-player-chip {
+  display: inline-flex;
+  max-width: 180px;
+  height: 38px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 10px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 10px;
+  background: rgb(8 17 36 / 0.86);
+  box-shadow: 0 3px 0 rgb(0 0 0 / 0.3);
+  color: var(--atp-cream);
+  font-size: 0.84rem;
+  font-weight: 700;
+  transition: border-color 160ms;
+}
+
+.atp-player-chip:hover {
+  border-color: var(--atp-mint);
+}
+
+.atp-player-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.atp-player-dot {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border-radius: 3px;
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.25);
+}
+
+.atp-kills {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 12px 6px 9px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 10px;
+  background: rgb(8 17 36 / 0.86);
+  box-shadow: 0 3px 0 rgb(0 0 0 / 0.3);
+  color: var(--atp-cream);
+}
+
+.atp-skull {
+  width: 20px;
+  height: 20px;
+}
+
+.atp-kills-value {
+  min-width: 2ch;
+  color: #ff8f7a;
+  font-family: var(--atp-font-block);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+  animation: atp-bump 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.atp-kills-label {
+  color: var(--atp-muted);
+  font-family: var(--atp-font-block);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+
+.atp-grass {
+  position: absolute;
+  z-index: -1;
+  width: 40px;
+  height: auto;
+  pointer-events: none;
+}
+
+.atp-grass-left {
+  left: -6px;
+  bottom: -112px;
+}
+
+.atp-grass-right {
+  right: -2px;
+  bottom: -116px;
+}
+
+/* The tufts grow beside the choices; over a start screen or an end card there are none. */
+.atp-play[data-phase='start'] .atp-grass,
+.atp-play[data-phase='summary'] .atp-grass {
+  display: none;
+}
+
+/* ------------------------------------------------------------ choices */
+
+.atp-choices {
+  grid-area: choices;
+  display: grid;
+  grid-template-columns: auto minmax(0, 420px) minmax(0, 420px) auto;
+  align-items: center;
+  justify-content: center;
+  gap: 18px clamp(18px, 2.6vw, 38px);
+  margin-top: clamp(12px, 1.4vw, 20px);
+}
+
+.atp-key {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  border: 3px solid #56637f;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #44516f 0%, #343f5b 100%);
+  box-shadow: 0 5px 0 #1b2440, inset 0 2px 0 rgb(255 255 255 / 0.14);
+  color: #f2f5fb;
+  font-family: var(--atp-font-block);
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.atp-choice {
+  display: flex;
+  height: clamp(64px, 6.2vw, 92px);
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 1.6vw, 24px);
+  padding: 0 24px;
+  border: 3px solid;
+  border-radius: 14px;
+  font-family: var(--atp-font-pixel);
+  font-size: clamp(1.2rem, 2.5vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1;
+  transition: transform 110ms ease-out, box-shadow 110ms ease-out, filter 200ms, opacity 200ms;
+}
+
+.atp-choice .atp-pixel-text {
+  display: inline-block;
+}
+
+.atp-choice .atp-arrow {
+  width: 0.62em;
+  height: auto;
+}
+
+.atp-choice.is-pull {
+  border-color: #2f9c70;
+  background: linear-gradient(180deg, #84f0c0 0%, #5cdba3 100%);
+  box-shadow: 0 6px 0 #258560, inset 0 3px 0 rgb(255 255 255 / 0.38), inset 0 -4px 0 rgb(0 0 0 / 0.08);
+  color: #0d2a1e;
+}
+
+.atp-choice.is-stay {
+  border-color: #c58723;
+  background: linear-gradient(180deg, #ffd462 0%, #f3b63b 100%);
+  box-shadow: 0 6px 0 #b0731b, inset 0 3px 0 rgb(255 255 255 / 0.4), inset 0 -4px 0 rgb(0 0 0 / 0.08);
+  color: #2a1906;
+}
+
+.atp-choice:enabled:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.atp-choice.is-pull:enabled:hover {
+  box-shadow: 0 8px 0 #258560, 0 0 30px -6px rgb(127 227 184 / 0.6), inset 0 3px 0 rgb(255 255 255 / 0.38);
+}
+
+.atp-choice.is-stay:enabled:hover {
+  box-shadow: 0 8px 0 #b0731b, 0 0 30px -6px rgb(255 205 87 / 0.55), inset 0 3px 0 rgb(255 255 255 / 0.4);
+}
+
+.atp-choice:enabled:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.35);
+}
+
+.atp-choice:disabled {
+  cursor: default;
+}
+
+.atp-choice[data-chosen='no'] {
+  opacity: 0.32;
+  filter: saturate(0.35);
+}
+
+.atp-choice[data-chosen='yes'] {
+  outline: 3px solid rgb(255 255 255 / 0.85);
+  outline-offset: 4px;
+}
+
+/* ---------------------------------------------------------- community */
+/* Bottom centre of the scene: the research note, then the bar, then the line under it. */
+
+.atp-dock {
+  grid-area: stage;
+  position: relative;
+  z-index: 4;
+  align-self: end;
+  justify-self: center;
+  display: flex;
+  width: min(460px, 42%);
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.atp-community {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 9px 12px 8px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 12px;
+  background: rgb(8 17 36 / 0.88);
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.3);
+}
+
+.atp-community-text {
+  margin: 0;
+  color: #d3dbe7;
+  font-size: clamp(0.76rem, 0.85vw, 0.86rem);
+  line-height: 1.35;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.atp-votes {
+  color: var(--atp-muted);
+  white-space: nowrap;
+}
+
+.atp-community-meter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.atp-meter {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+  padding: 4px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 8px;
+  background: #0c1a33;
+}
+
+.atp-meter span {
+  flex: 1;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--atp-segment);
+  transition: background-color 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+.atp-meter span.is-on {
+  background: var(--atp-mint-bar);
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.16), inset 0 2px 0 rgb(255 255 255 / 0.32);
+}
+
+.atp-meter.is-empty span {
+  background: repeating-linear-gradient(135deg, #18304d 0 4px, #142842 4px 8px);
+}
+
+.atp-pct {
+  min-width: 4ch;
+  color: #6fd1a7;
+  font-family: var(--atp-font-block);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.atp-next {
+  display: inline-flex;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 18px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 10px;
+  color: #b8c4d6;
+  font-size: 0.94rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: border-color 160ms, color 160ms, background-color 160ms, box-shadow 160ms;
+}
+
+.atp-next .atp-arrow {
+  width: 14px;
+  height: auto;
+}
+
+.atp-next:enabled:hover {
+  border-color: var(--atp-mint);
+  color: #eafff4;
+}
+
+.atp-next:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* Bottom right of the scene. */
+.atp-play > .atp-next {
+  grid-area: stage;
+  position: relative;
+  z-index: 4;
+  align-self: end;
+  justify-self: end;
+  margin: 0 14px 14px 0;
+  background: rgb(8 17 36 / 0.88);
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.3);
+}
+
+.atp-play > .atp-next:enabled,
+.atp-next.is-primary {
+  border-color: #5fdba7;
+  background: rgb(18 52 48 / 0.92);
+  color: #eafff4;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.3), 0 0 24px -8px rgb(95 219 167 / 0.6);
+  animation: atp-pop 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.atp-hint {
+  grid-area: hint;
+  margin: 14px 0 0;
+  color: #6e7d97;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+@media (pointer: coarse) {
+  .atp-hint {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------ summary */
+
+.atp-summary {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: min(660px, 92%);
+  height: fit-content;
+  max-height: 96%;
+  margin: auto;
+  overflow: auto;
+  padding: 22px 26px 24px;
+  border: 3px solid #3d5d8c;
+  border-radius: 16px;
+  background: rgb(8 17 36 / 0.94);
+  box-shadow: 0 10px 0 rgb(0 0 0 / 0.35);
+  text-align: center;
+  animation: atp-pop 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.atp-summary-eyebrow {
+  margin: 0;
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.atp-summary-title {
+  margin: 6px 0 0;
+  color: var(--atp-cream);
+  font-family: var(--atp-font-pixel);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 700;
+}
+
+.atp-summary-text {
+  margin: 6px auto 0;
+  max-width: 48ch;
+  color: var(--atp-text);
+}
+
+.atp-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0 0;
+}
+
+.atp-summary-stat {
+  padding: 10px 8px;
+  border: 2px solid var(--atp-line);
+  border-radius: 10px;
+  background: var(--atp-panel);
+}
+
+.atp-summary-stat dt {
+  color: var(--atp-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.atp-summary-stat dd {
+  margin: 4px 0 0;
+  color: var(--atp-mint-hi);
+  font-family: var(--atp-font-block);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.atp-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* ------------------------------------------------------ motion scenes */
+/* Philippa Foot's problems drawn in smooth SVG, in the 3D stage's frame. */
+
+.atp-motion {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-family: var(--atp-font-pixel);
+  user-select: none;
+}
+
+.atp-m-shadow {
+  fill: #020713;
+  opacity: 0.35;
+}
+
+.atp-m-bed {
+  fill: none;
+  stroke: #21383d;
+  stroke-width: 38;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.atp-m-sleeper {
+  fill: #4b3a2e;
+}
+
+.atp-m-rail-shade,
+.atp-m-rail {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.atp-m-rail-shade {
+  stroke: #17203a;
+  stroke-width: 5.5;
+}
+
+.atp-m-rail {
+  stroke: #aab7cd;
+  stroke-width: 2.6;
+}
+
+/* The way the tram will go, lit up as it sets off. */
+.atp-m-glow {
+  fill: none;
+  stroke: #7fe3b8;
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.32;
+}
+
+.atp-m-blade {
+  fill: #7fe3b8;
+}
+
+.atp-m-pivot {
+  fill: #e9f7ff;
+  stroke: #2a3550;
+  stroke-width: 2;
+}
+
+.atp-m-lamp {
+  fill: #13254a;
+  stroke: #8a94a6;
+  stroke-width: 2.5;
+}
+
+/* While the switch can be clicked: a ring that keeps calling. */
+.atp-m-hint {
+  fill: none;
+  stroke: #7fe3b8;
+  stroke-width: 3;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.atp-motion.is-live [data-state='waiting'] .atp-m-hint {
+  animation: atp-m-hint 1.6s ease-out infinite;
+}
+
+.atp-m-hotspot {
+  fill: transparent;
+  pointer-events: none;
+}
+
+.atp-motion.is-live .atp-m-hotspot {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.atp-m-pill rect {
+  fill: rgb(8 17 36 / 0.86);
+  stroke-width: 2;
+}
+
+.atp-m-pill.is-pull rect {
+  stroke: #5cdba3;
+}
+
+.atp-m-pill.is-stay rect {
+  stroke: #f2b04a;
+}
+
+.atp-m-pill text {
+  fill: #fbefd6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.atp-m-badge-text {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.atp-m-sign-text {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.atp-m-badge {
+  animation: atp-m-bob 1.8s ease-in-out infinite;
+}
+
+.atp-m-idle {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: atp-m-breathe 2.8s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.atp-m-idle.is-still {
+  animation: none;
+}
+
+.atp-m-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atp-m-blink 4.6s infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.atp-m-star {
+  animation: atp-m-twinkle 3.4s ease-in-out infinite;
+}
+
+/* The tram strains against the frozen moment; its wheels throw sparks. */
+[data-state='waiting'] [data-part='tremble'] {
+  animation: atp-m-tremble 0.12s steps(2) infinite;
+}
+
+.atp-m-sparks {
+  opacity: 0;
+}
+
+[data-state='arriving'] .atp-m-sparks,
+[data-state='waiting'] .atp-m-sparks {
+  animation: atp-m-sparks 0.18s steps(2) infinite;
+}
+
+.atp-m-blink {
+  animation: atp-m-blinker 0.9s steps(2) infinite;
+}
+
+.atp-m-mob-body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: atp-m-sway 1.1s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.atp-m-mob-arm {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: atp-m-fist 0.7s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.atp-m-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: atp-m-flame 0.35s ease-in-out infinite alternate;
+}
+
+[data-mood='furious'] .atp-m-flame {
+  animation-duration: 0.16s;
+}
+
+[data-mood='furious'] .atp-m-mob-arm {
+  animation-duration: 0.32s;
+}
+
+[data-mood='satisfied'] .atp-m-mob-arm,
+[data-mood='satisfied'] .atp-m-mob-body {
+  animation: none;
+}
+
+.atp-m-court-text {
+  fill: #6b5c40;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+}
+
+.atp-m-stamp rect {
+  fill: rgb(255 255 255 / 0.06);
+  stroke-width: 4;
+}
+
+.atp-m-stamp text {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.atp-m-stamp.is-pull rect {
+  stroke: #ff5b4d;
+}
+
+.atp-m-stamp.is-pull text {
+  fill: #ff5b4d;
+}
+
+.atp-m-stamp.is-stay rect {
+  stroke: #5cdba3;
+}
+
+.atp-m-stamp.is-stay text {
+  fill: #5cdba3;
+}
+
+.atp-m-bars rect {
+  fill: #8a94a6;
+  stroke: #2a3550;
+  stroke-width: 1.5;
+}
+
+/* The pilot's plane: a spinning propeller, a trail of smoke, clouds going by. */
+.atp-m-prop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atp-m-prop 0.12s linear infinite;
+}
+
+.atp-m-puff {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atp-m-puff 1.2s ease-out infinite;
+}
+
+.atp-m-cloud {
+  animation: atp-m-cloud 26s ease-in-out infinite alternate;
+}
+
+.atp-m-cloud.is-slow {
+  animation-duration: 38s;
+}
+
+/* The ward: monitors that beep, gas that drifts, a life drawn off in a stream of light. */
+.atp-m-ecg {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 46 30;
+  animation: atp-m-ecg 1.4s linear infinite;
+}
+
+.atp-m-ecg.is-weak {
+  stroke: #ffd36b;
+  animation-duration: 2.2s;
+}
+
+.atp-m-ecg.is-well {
+  stroke: #7fe3b8;
+  animation-duration: 0.9s;
+}
+
+.atp-m-ecg.is-flat {
+  stroke: #ff5b4d;
+  stroke-dasharray: none;
+  animation: none;
+}
+
+.atp-m-mist {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atp-m-mist 3s ease-in-out infinite alternate;
+}
+
+.atp-m-flow {
+  animation: atp-m-flow 0.8s linear infinite;
+}
+
+.atp-m-stream {
+  fill: none;
+  stroke: #7fe3b8;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 6 10;
+  animation: atp-m-flow 0.5s linear infinite;
+}
+
+.atp-m-glow-pulse {
+  animation: atp-m-twinkle 1.6s ease-in-out infinite;
+}
+
+/* After the crash, an ambulance's lights flash in the ward's windows. */
+.atp-m-siren rect {
+  opacity: 0;
+  animation: atp-m-siren 0.9s steps(1) infinite;
+}
+
+.atp-m-siren .atp-m-siren-red {
+  animation-delay: -0.45s;
+}
+
+[data-state='done'] .atp-m-siren rect {
+  animation: none;
+}
+
+@keyframes atp-m-siren {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The cave: a tide that laps, a fuse that fizzes. */
+.atp-m-wave {
+  animation: atp-m-wave 3.2s linear infinite;
+}
+
+.atp-m-wave.is-back {
+  animation-duration: 4.6s;
+  animation-direction: reverse;
+}
+
+/* The cave's water rises and falls every 160, not 80: carried a whole wave, at the same speed, it never jumps. */
+.atp-m-wave.is-long {
+  animation-name: atp-m-wave-long;
+  animation-duration: 6.4s;
+}
+
+.atp-m-wave.is-long.is-back {
+  animation-duration: 9.2s;
+}
+
+@keyframes atp-m-wave-long {
+  to {
+    transform: translateX(160px);
+  }
+}
+
+.atp-m-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: atp-m-spark 0.16s steps(2) infinite;
+}
+
+/* The sea: a lifeboat that rocks, rain that lashes, lightning now and then, bubbles from below. */
+.atp-m-sea-rock {
+  transform-origin: 0 0;
+  animation: atp-m-sea-rock 3.6s ease-in-out infinite;
+}
+
+.atp-m-sea-rain {
+  animation: atp-m-sea-rain 0.6s linear infinite;
+}
+
+.atp-m-sea-rain.is-far {
+  animation-duration: 0.95s;
+}
+
+[data-state='waiting'] .atp-m-sea-lightning {
+  animation: atp-m-sea-lightning 6.4s linear infinite;
+}
+
+.atp-m-sea-bubble {
+  animation: atp-m-sea-bubble 2.4s ease-in infinite;
+}
+
+@keyframes atp-m-sea-rock {
+  0%,
+  100% {
+    transform: rotate(-2.2deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(2.2deg);
+  }
+}
+
+@keyframes atp-m-sea-rain {
+  to {
+    transform: translate(-60px, 240px);
+  }
+}
+
+@keyframes atp-m-sea-lightning {
+  0%,
+  70%,
+  76%,
+  100% {
+    opacity: 0;
+  }
+  71% {
+    opacity: 1;
+  }
+  72.5% {
+    opacity: 0.25;
+  }
+  74% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes atp-m-sea-bubble {
+  from {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-34px);
+  }
+}
+
+/* The school: the statistics board's title, and the amber stamp that shelves the reform. */
+.atp-m-school-title {
+  fill: #c8d1df;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.atp-m-stamp.atp-m-school-shelved rect {
+  stroke: #f2b04a;
+}
+
+.atp-m-stamp.atp-m-school-shelved text {
+  fill: #f2b04a;
+}
+
+/* Steam curling up from something hot: the beggar's soup, the children's bowls once they are full. */
+.atp-m-steam {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: atp-m-steam 1.8s ease-out infinite;
+}
+
+@keyframes atp-m-steam {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scaleX(0.8);
+  }
+  35% {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-9px) scaleX(1.15);
+  }
+}
+
+/* The shop: the poured-away oil running to the drain, and the word on the poison label. */
+.atp-m-shop-oil {
+  fill: none;
+  stroke: #ffd36b;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 5 9;
+  animation: atp-m-flow 0.6s linear infinite;
+}
+
+.atp-m-shop-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atp-motion * {
+    animation: none !important;
+  }
+}
+
+@keyframes atp-m-wave {
+  to {
+    transform: translateX(80px);
+  }
+}
+
+@keyframes atp-m-spark {
+  50% {
+    opacity: 0.4;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes atp-m-ecg {
+  from {
+    stroke-dashoffset: 76;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes atp-m-mist {
+  from {
+    transform: scale(0.92);
+  }
+  to {
+    transform: scale(1.08) translateY(-6px);
+  }
+}
+
+@keyframes atp-m-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@keyframes atp-m-prop {
+  50% {
+    transform: scaleY(0.25);
+  }
+}
+
+@keyframes atp-m-puff {
+  from {
+    opacity: 0.8;
+    transform: translate(0, 0) scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-40px, -16px) scale(1.4);
+  }
+}
+
+@keyframes atp-m-cloud {
+  to {
+    transform: translateX(60px);
+  }
+}
+
+@keyframes atp-m-hint {
+  from {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes atp-m-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes atp-m-breathe {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: scale(1.012, 1.03);
+  }
+}
+
+@keyframes atp-m-blink {
+  0%,
+  95%,
+  100% {
+    transform: none;
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes atp-m-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes atp-m-tremble {
+  0% {
+    transform: none;
+  }
+  50% {
+    transform: translate(0.6px, -0.8px);
+  }
+}
+
+@keyframes atp-m-sparks {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes atp-m-blinker {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes atp-m-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-2px);
+  }
+}
+
+@keyframes atp-m-fist {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes atp-m-flame {
+  from {
+    transform: none;
+  }
+  to {
+    transform: scale(0.9, 1.14);
+  }
+}
+
+/* ------------------------------------------------- Foot's problems: UI */
+
+/* Which set and case this is, over the question. */
+.atp-eyebrow {
+  margin: 0 0 6px;
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+}
+
+.atp-heading.is-book .atp-eyebrow {
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.atp-title-book {
+  color: var(--atp-cream);
+  font-family: var(--atp-font-serif);
+  font-size: clamp(1.1rem, 2.2vw, 2.1rem);
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.15;
+  text-shadow: 0 2px 0 #060f22;
+}
+
+/* Over the list tabs: whose problems they show, the absurd ones or Foot's. */
+.atp-set-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: clamp(18px, 2.4vw, 32px);
+}
+
+.atp-set-switch ~ [role='tabpanel'] .atp-list-view {
+  padding-top: 18px;
+}
+
+.atp-set-switch .atp-chip[aria-pressed='true'] {
+  border-color: var(--atp-mint);
+  background: rgb(95 219 167 / 0.12);
+  color: var(--atp-cream);
+}
+
+.atp-set-chip .atp-arrow {
+  width: 11px;
+  height: auto;
+  color: var(--atp-mint-hi);
+  transform: scaleX(-1);
+}
+
+/* Foot's own answer: at the head of the research once you have chosen, and on the case cards. */
+.atp-verdict {
+  margin: 0 0 6px;
+  line-height: 1.6;
+}
+
+.atp-card .atp-verdict {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.atp-verdict-who {
+  color: #ffd36b;
+  font-weight: 800;
+}
+
+.atp-verdict-choice {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 6px;
+  font-weight: 800;
+}
+
+.atp-verdict-choice.is-pull {
+  background: #5cdba3;
+  color: #0d2a1e;
+}
+
+.atp-verdict-choice.is-stay {
+  background: #f2b04a;
+  color: #2a1906;
+}
+
+.atp-verdict[data-agrees='true'] .atp-verdict-match {
+  color: var(--atp-mint-hi);
+}
+
+.atp-verdict[data-agrees='false'] .atp-verdict-match {
+  color: #ffb39f;
+}
+
+/* The end card: where you stand against the essay, then your calls grouped by Foot's distinctions. */
+.atp-foot-summary {
+  width: min(1040px, calc(100% - 32px));
+  padding: 22px 24px 20px;
+  text-align: left;
+}
+
+.atp-fs-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 28px;
+}
+
+.atp-fs-profile .atp-summary-title .atp-pixel-canvas {
+  margin-inline: 0;
+}
+
+.atp-fs-profile .atp-summary-text {
+  margin-inline: 0;
+  max-width: 62ch;
+}
+
+.atp-fs-score {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 220px;
+  padding: 12px 16px 10px;
+  border: 2px solid var(--atp-line);
+  border-radius: 12px;
+  background: var(--atp-panel);
+}
+
+.atp-fs-score-value {
+  margin: 0;
+  color: var(--atp-mint-hi);
+  font-family: var(--atp-font-block);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.atp-fs-score-value span {
+  color: var(--atp-muted);
+  font-size: 1.4rem;
+}
+
+.atp-fs-score .atp-meter {
+  width: 100%;
+}
+
+.atp-fs-score .atp-meter span {
+  height: 10px;
+}
+
+.atp-fs-score-label {
+  margin: 0;
+  color: var(--atp-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.atp-foot-summary .atp-summary-actions {
+  justify-content: flex-start;
+  margin-top: 16px;
+}
+
+.atp-fs-heading {
+  margin: 22px 0 10px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--atp-line-strong);
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Masonry columns: the groups differ in length, so they pack instead of sitting in rows. */
+.atp-fs-groups {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 3 260px;
+  column-gap: 12px;
+}
+
+.atp-fs-group {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  padding: 11px 10px 8px;
+  border: 2px solid var(--atp-line);
+  border-radius: 12px;
+  background: var(--atp-panel);
+}
+
+.atp-fs-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-inline: 4px;
+}
+
+.atp-fs-group-title {
+  margin: 0;
+  color: var(--atp-cream);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.atp-fs-group-score {
+  flex: none;
+  color: #ffb39f;
+  font-family: var(--atp-font-block);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.atp-fs-group-score[data-all='true'] {
+  color: var(--atp-mint-hi);
+}
+
+.atp-fs-rule {
+  margin: 3px 4px 8px;
+  color: #c3cbd9;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.atp-fs-rule span {
+  color: #ffd36b;
+  font-weight: 800;
+}
+
+.atp-fs-cases {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atp-fs-case {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 1px 8px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.03);
+  text-align: left;
+  transition: border-color 160ms, background-color 160ms;
+}
+
+.atp-fs-case:hover {
+  border-color: var(--atp-line-strong);
+  background: rgb(255 255 255 / 0.07);
+}
+
+.atp-fs-case[data-state='differ'] {
+  background: rgb(255 140 115 / 0.07);
+}
+
+.atp-fs-mark {
+  grid-row: span 2;
+  color: var(--atp-muted);
+  font-size: 0.85rem;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.atp-fs-case[data-state='same'] .atp-fs-mark {
+  color: var(--atp-mint-hi);
+}
+
+.atp-fs-case[data-state='differ'] .atp-fs-mark {
+  color: #ffb39f;
+}
+
+.atp-fs-case-title {
+  color: var(--atp-cream);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.atp-fs-case-call {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  color: var(--atp-muted);
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.atp-fs-chip.is-pull {
+  color: #6fe0ae;
+}
+
+.atp-fs-chip.is-stay {
+  color: #f2b04a;
+}
+
+.atp-fs-foot span {
+  color: #ffd36b;
+  font-weight: 700;
+}
+
+/* A summary in the stage's place: the scene stretches behind it, dimmed, and the panel clears the HUD. */
+.atp-stage-wrap.has-summary {
+  display: grid;
+}
+
+.atp-stage-wrap.has-summary > .atp-stage {
+  grid-area: 1 / 1;
+  height: auto;
+  min-height: max(60svh, 240px);
+}
+
+.atp-stage-wrap.has-summary > .atp-summary {
+  position: relative;
+  inset: auto;
+  grid-area: 1 / 1;
+  align-self: center;
+  max-height: none;
+  margin: 68px auto 28px;
+  overflow: visible;
+}
+
+.atp-foot-note {
+  max-width: 54ch;
+  color: var(--atp-muted);
+  font-size: 0.8rem;
+}
+
+/* Every case in the essay. */
+.atp-foot-cases {
+  margin-top: clamp(28px, 4vw, 48px);
+}
+
+.atp-foot-cases-title {
+  margin: 0;
+  color: var(--atp-cream);
+  font-family: var(--atp-font-serif);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.atp-case-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 12px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atp-case {
+  padding: 14px 16px 16px;
+  border: 2px solid var(--atp-line);
+  border-radius: 12px;
+  background: var(--atp-panel);
+}
+
+.atp-case.is-playable {
+  border-color: #3f8f72;
+}
+
+.atp-case-number {
+  margin: 0;
+  color: var(--atp-muted);
+  font-family: var(--atp-font-block);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+}
+
+.atp-case-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 4px 0 0;
+  color: var(--atp-cream);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.atp-case-tag {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #3f8f72;
+  color: #e9fff4;
+  font-family: var(--atp-font-block);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+}
+
+.atp-case-summary {
+  margin: 6px 0 0;
+  color: var(--atp-text);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.atp-case-verdict {
+  margin: 10px 0 0;
+  padding-top: 9px;
+  border-top: 1px dashed var(--atp-line-strong);
+  color: #d3dbe7;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.atp-case-verdict span {
+  color: #ffd36b;
+  font-weight: 800;
+}
+
+/* --------------------------------------------------------- list views */
+
+.atp-list-view {
+  padding: clamp(18px, 2.4vw, 32px) 0 8px;
+}
+
+.atp-view-heading {
+  margin-bottom: 18px;
+}
+
+.atp-view-title {
+  margin: 0;
+  color: var(--atp-cream);
+  font-family: var(--atp-font-pixel);
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  font-weight: 700;
+}
+
+.atp-view-title .atp-pixel-canvas {
+  margin-inline: 0;
+}
+
+.atp-view-intro,
+.atp-view-note {
+  margin: 6px 0 0;
+  max-width: 70ch;
+  color: var(--atp-text);
+}
+
+.atp-whose {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: -4px 0 20px;
+  padding: 10px 12px;
+  border: 2px solid #26406a;
+  border-radius: 12px;
+  background: var(--atp-panel);
+}
+
+.atp-whose-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--atp-text);
+  font-size: 0.9rem;
+}
+
+.atp-whose-name strong {
+  color: var(--atp-cream);
+}
+
+.atp-whose-name .atp-avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+}
+
+.atp-whose .atp-chip {
+  margin-left: auto;
+}
+
+.atp-chapter + .atp-chapter {
+  margin-top: 28px;
+}
+
+/* The chapter's name, how much of it is played, and taking it back or starting over. */
+.atp-chapter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 12px;
+}
+
+.atp-chapter-title {
+  margin: 0;
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+}
+
+.atp-chapter-count {
+  margin: 0;
+  color: var(--atp-muted);
+  font-size: 0.8rem;
+}
+
+.atp-chapter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.atp-chip {
+  display: inline-flex;
+  height: 30px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 9px;
+  color: var(--atp-mint-hi);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: border-color 160ms, background-color 160ms, color 160ms;
+}
+
+.atp-chip:enabled:hover {
+  border-color: var(--atp-mint);
+}
+
+.atp-chip .atp-arrow {
+  width: 11px;
+  height: auto;
+}
+
+.atp-chip.is-reset {
+  color: #ffa594;
+}
+
+.atp-chip.is-reset:enabled:hover,
+.atp-chip.is-reset.is-confirming {
+  border-color: #ff8f7a;
+}
+
+.atp-chip.is-reset.is-confirming {
+  background: rgb(255 143 122 / 0.16);
+  color: #ffe1d9;
+}
+
+.atp-chip:disabled,
+.atp-card-reset:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.atp-reset-arrow {
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+
+.atp-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 2px solid #26406a;
+  border-radius: 14px;
+  background: var(--atp-panel);
+}
+
+.atp-card-number {
+  color: var(--atp-mint-hi);
+  font-family: var(--atp-font-block);
+  font-size: 1rem;
+}
+
+.atp-card-title {
+  margin: 0;
+  color: var(--atp-cream);
+  font-family: var(--atp-font-pixel);
+  font-size: 1.18rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.atp-card-setup {
+  margin: 0;
+  color: #aab6c9;
+  font-size: 0.86rem;
+}
+
+.atp-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.atp-badge {
+  width: fit-content;
+  margin: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #1c2f4f;
+  color: #aab6c9;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.atp-badge.is-pull {
+  background: rgb(95 219 167 / 0.15);
+  color: var(--atp-mint-hi);
+}
+
+.atp-badge.is-stay {
+  background: rgb(247 192 70 / 0.15);
+  color: #ffd36b;
+}
+
+.atp-card-meter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6fd1a7;
+  font-family: var(--atp-font-block);
+  font-size: 0.8rem;
+}
+
+.atp-card-meter .atp-meter {
+  width: auto;
+  flex: 1;
+  padding: 3px;
+  gap: 2px;
+}
+
+.atp-card-meter .atp-meter span {
+  height: 9px;
+}
+
+.atp-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+
+.atp-card-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffa594;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.atp-card-reset:enabled:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.atp-card-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  color: var(--atp-mint-hi);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.atp-card-play .atp-arrow {
+  width: 12px;
+  height: auto;
+}
+
+.atp-card-play:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* ------------------------------------------------------------ compare */
+
+.atp-vs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--atp-text);
+}
+
+.atp-vs-empty p {
+  margin: 0;
+}
+
+.atp-vs-pickers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.atp-vs-pick {
+  min-width: min(100%, 200px);
+}
+
+.atp-vs-mark {
+  padding-bottom: 9px;
+  color: #ffd36b;
+  font-family: var(--atp-font-block);
+  font-size: 1.1rem;
+}
+
+.atp-vs-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.atp-vs-totals {
+  padding: 14px;
+  border: 2px solid #26406a;
+  border-radius: 14px;
+  background: var(--atp-panel);
+}
+
+.atp-vs-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  overflow: hidden;
+  color: var(--atp-cream);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.atp-vs-name .atp-avatar {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  font-size: 1.1rem;
+}
+
+.atp-vs-totals dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.atp-vs-totals dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.84rem;
+}
+
+.atp-vs-totals dt {
+  color: var(--atp-muted);
+}
+
+.atp-vs-totals dd {
+  margin: 0;
+  color: var(--atp-cream);
+  font-weight: 700;
+  text-align: right;
+}
+
+.atp-vs-score {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 14px;
+  background: rgb(8 17 36 / 0.6);
+  text-align: center;
+}
+
+.atp-vs-score p {
+  margin: 0;
+}
+
+.atp-vs-percent {
+  color: var(--atp-mint-hi);
+  font-family: var(--atp-font-pixel);
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.atp-vs-shared {
+  color: var(--atp-muted);
+  font-size: 0.82rem;
+}
+
+.atp-vs-verdict {
+  color: #ffd36b;
+  font-weight: 800;
+}
+
+.atp-vs-lives {
+  color: var(--atp-text);
+  font-size: 0.84rem;
+}
+
+.atp-vs-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--atp-text);
+  font-size: 0.84rem;
+}
+
+.atp-vs-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atp-vs-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  border: 2px solid #22385d;
+  border-radius: 12px;
+  background: var(--atp-panel);
+}
+
+.atp-vs-row.is-differ {
+  border-color: rgb(255 143 122 / 0.55);
+}
+
+.atp-vs-title {
+  margin: 0;
+  color: var(--atp-cream);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.atp-vs-tag {
+  margin: 0;
+  color: var(--atp-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.atp-vs-tag.is-differ {
+  color: #ffa594;
+}
+
+@media (max-width: 760px) {
+  .atp-vs-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .atp-vs-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .atp-vs-row > .atp-badge,
+  .atp-vs-row > .atp-vs-tag {
+    grid-column: 2;
+  }
+}
+
+.atp-highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.atp-highlight {
+  padding: 14px 16px;
+  border: 2px solid #26406a;
+  border-radius: 12px;
+  background: var(--atp-panel);
+}
+
+.atp-highlight dt {
+  color: var(--atp-muted);
+  font-family: var(--atp-font-block);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+}
+
+.atp-highlight dd {
+  margin: 6px 0 0;
+}
+
+.atp-highlight-value {
+  display: block;
+  color: var(--atp-mint-hi);
+  font-family: var(--atp-font-block);
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.atp-highlight-title {
+  display: block;
+  margin-top: 2px;
+  color: var(--atp-cream);
+  font-size: 0.88rem;
+}
+
+.atp-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atp-bar-row {
+  display: grid;
+  grid-template-columns: 2.6ch minmax(0, 1fr) minmax(140px, 38%);
+  align-items: center;
+  gap: 12px;
+}
+
+.atp-bar-number {
+  color: var(--atp-mint-hi);
+  font-family: var(--atp-font-block);
+  font-size: 0.8rem;
+}
+
+.atp-bar-title {
+  color: var(--atp-cream);
+  font-size: 0.9rem;
+}
+
+.atp-bar {
+  position: relative;
+  display: block;
+  height: 24px;
+  overflow: hidden;
+  border: 2px solid var(--atp-line-strong);
+  border-radius: 6px;
+  background: #f3b63b;
+}
+
+.atp-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--atp-mint-bar);
+}
+
+.atp-bar-label {
+  position: relative;
+  padding-left: 8px;
+  color: #0d2a1e;
+  font-family: var(--atp-font-block);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.atp-bar-empty {
+  color: var(--atp-muted);
+  font-size: 0.8rem;
+}
+
+/* ---------------------------------------------------------- responsive */
+
+@media (max-width: 1199px) {
+  .atp-header-inner {
+    grid-template-areas:
+      'back brand . tools account'
+      'tabs tabs tabs tabs tabs';
+  }
+
+  .atp-header .atp-tabs {
+    position: static;
+    grid-area: tabs;
+    justify-self: center;
+    transform: none;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Tablets: the header keeps one row by dropping the back link's words and the twinkle. */
+  .atp-header-inner {
+    gap: 8px;
+  }
+
+  .atp-back {
+    padding: 0 9px;
+  }
+
+  .atp-back-label,
+  .atp-brand-twinkle {
+    display: none;
+  }
+
+  .atp-choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .atp-key {
+    display: none;
+  }
+
+  .atp-dock {
+    width: 46%;
+  }
+
+  .atp-next {
+    gap: 9px;
+    padding: 0 13px;
+    font-size: 0.86rem;
+  }
+
+  .atp-grass {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  :root[data-theme='light'] .atp {
+    margin-inline: -8px;
+    padding: 14px 12px 18px;
+    border-radius: 20px;
+  }
+
+  .atp-header-inner {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'back brand account'
+      'tabs tabs tabs'
+      'tools tools tools';
+    gap: 10px 8px;
+    padding-block: 10px 12px;
+  }
+
+  .atp-brand-top {
+    font-size: 1.6rem;
+  }
+
+  .atp-brand-bottom {
+    font-size: 0.66rem;
+  }
+
+  /* The logo needs every pixel between the back and account buttons, and shrinks to fit if that is not enough. */
+  .atp-brand-sparkle {
+    display: none;
+  }
+
+  .atp-brand,
+  .atp-brand-link,
+  .atp-brand-stack,
+  .atp-brand .atp-pixel-text {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .atp-brand .atp-pixel-text {
+    display: block;
+  }
+
+  .atp-brand .atp-pixel-canvas {
+    max-width: 100%;
+    /* PixelText sets a pixel height; auto keeps the canvas's own proportions when max-width bites. */
+    height: auto !important;
+  }
+
+  /* A signed-in player is just their avatar here (the name hides below 640px): no padding after it. */
+  .atp-profile {
+    padding-right: 2px;
+  }
+
+  .atp-header-tools {
+    gap: 6px;
+  }
+
+  /* The counter on the left, the switches on the right. */
+  .atp-header-tools .atp-counter {
+    margin-right: auto;
+  }
+
+  .atp-header-account {
+    gap: 6px;
+  }
+
+  .atp-counter {
+    font-size: 1rem;
+  }
+
+  .atp-header .atp-tabs {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .atp-tab {
+    flex: 1;
+    padding: 6px;
+    text-align: center;
+  }
+
+  .atp-stage {
+    border-radius: 14px;
+  }
+
+  /* No room over a phone's scene: the choices first, then (once decided) what everyone did in their place. */
+  .atp-play {
+    grid-template-areas: 'heading' 'stage' 'choices' 'dock' 'next' 'hint';
+  }
+
+  .atp-dock,
+  .atp-play > .atp-next {
+    align-self: auto;
+    justify-self: stretch;
+    width: auto;
+  }
+
+  .atp-dock {
+    grid-area: dock;
+    margin: 12px 0 0;
+  }
+
+  .atp-play > .atp-next {
+    grid-area: next;
+    margin: 10px 0 0;
+  }
+
+  /* Only the play view's own buttons: a summary's .atp-next buttons must stay. */
+  .atp-play[data-phase='result'] > .atp-choices,
+  .atp-play:not([data-phase='result']) > .atp-dock,
+  .atp-play:not([data-phase='result']) > .atp-next {
+    display: none;
+  }
+
+  .atp-choices {
+    gap: 12px;
+  }
+
+  .atp-choice {
+    padding: 0 12px;
+  }
+
+  /* The HUD's chips span a phone's stage: what you just did goes under them, not over them. */
+  .atp-quip {
+    top: 46px;
+    left: 8px;
+    right: 8px;
+    max-width: none;
+    padding: 8px 12px;
+  }
+
+  /* Over the scene, under the HUD's row of chips, edge to edge. */
+  .atp-stage-wrap.has-summary > .atp-summary {
+    width: calc(100% - 16px);
+    margin: 54px auto 8px;
+    padding: 16px 14px 14px;
+  }
+
+  .atp-summary-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .atp-summary-actions .atp-next {
+    flex: 1 1 auto;
+  }
+
+  .atp-fs-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .atp-fs-score {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    column-gap: 14px;
+    min-width: 0;
+  }
+
+  .atp-fs-score-value {
+    grid-row: span 2;
+    font-size: 2.1rem;
+  }
+
+  .atp-hud {
+    top: 8px;
+    right: 8px;
+    gap: 6px;
+  }
+
+  .atp-kills {
+    gap: 5px;
+    padding: 3px 8px 3px 6px;
+  }
+
+  .atp-player-chip {
+    max-width: 120px;
+    height: 30px;
+    padding: 0 9px 0 7px;
+    font-size: 0.76rem;
+  }
+
+  .atp-start {
+    padding: 12px;
+  }
+
+  .atp-skull {
+    width: 15px;
+    height: 15px;
+  }
+
+  .atp-kills-value {
+    font-size: 0.92rem;
+  }
+
+  .atp-kills-label {
+    font-size: 0.55rem;
+  }
+
+  .atp-bar-row {
+    grid-template-columns: 2.6ch minmax(0, 1fr);
+  }
+
+  .atp-bar,
+  .atp-bar-empty {
+    grid-column: 2;
+  }
+}
+
+/* ---------------------------------------------------------- animation */
+
+@keyframes atp-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes atp-bump {
+  0% {
+    transform: scale(1.7);
+    color: #ffffff;
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes atp-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes atp-loader {
+  to {
+    transform: translateX(48px);
+  }
+}

@@ -15,6 +15,7 @@ import { runRoutes } from './runs/routes'
 import { requireTrustedOrigin } from './security/origin'
 import { staticSite } from './static/site'
 import { systemRoutes } from './system/routes'
+import { trolleyRoutes } from './trolley/routes'
 
 const KIB = 1024
 /** Recordings: up to 5000 inputs of ~40 bytes each. */
@@ -62,6 +63,7 @@ export function createApp(deps: AppDeps): Hono<AppEnv> {
   app.route('/api', meRoutes(deps))
   app.route('/api', runRoutes(deps))
   app.route('/api', leaderboardRoutes(deps))
+  app.route('/api', trolleyRoutes(deps))
 
   if (deps.config.staticDir) {
     const compressSite = compress()

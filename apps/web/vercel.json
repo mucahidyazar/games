@@ -72,6 +72,10 @@
     {
       "source": "/trap-the-orb/play/:mode",
       "destination": "/index.html"
+    },
+    {
+      "source": "/absurd-trolley-problems",
+      "destination": "/index.html"
     }
   ]
 }

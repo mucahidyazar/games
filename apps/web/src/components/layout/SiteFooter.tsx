@@ -1,3 +1,5 @@
+import { CHROME } from '@/app/copy'
+import { useLang, type Lang } from '@/app/lang'
 import { Link } from '@/app/Link'
 import { footerColumnsFor, type NavItem } from '@/app/navigation'
 import { paths, site } from '@/app/site'
@@ -12,10 +14,7 @@ type SiteFooterProps = {
   readonly onOpenPrivacySettings: () => void
 }
 
-const TAGLINES = {
-  portal: 'Small, sharp games that run right in your browser. No download, no sign-up needed.',
-  game: 'Trap the orbs. Claim the space. A free arcade game for your browser — no download, no sign-up needed.',
-} as const
+const TAGLINES = { portal: CHROME.footer.portalTagline, game: CHROME.footer.gameTagline } as const
 
 function FooterLink({ item }: { readonly item: NavItem }) {
   const external = item.isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {}
@@ -37,32 +36,43 @@ function FooterLink({ item }: { readonly item: NavItem }) {
 }
 
 /** The maker's signature under the footer, on every site. */
-function MadeWith() {
+function MadeWith({ lang }: { readonly lang: Lang }) {
   const portalHref = site.kind === 'portal' ? paths.home() : PORTAL.url
+  const linkClass = 'rounded font-semibold text-[var(--chrome-fg)] underline-offset-4 transition hover:opacity-75 hover:underline'
+  const maker = (
+    <a href="https://mucahid.dev" target="_blank" rel="noopener noreferrer" className={linkClass}>
+      mucahid.dev
+    </a>
+  )
+  const portal = (
+    <Link href={portalHref} className={linkClass}>
+      games.mucahid.dev
+    </Link>
+  )
+  const heart = (
+    <span role="img" aria-label={CHROME.footer.love[lang]}>
+      💜
+    </span>
+  )
   return (
     <p className="flex flex-wrap items-center justify-center gap-x-1.5 text-[0.8rem] text-[var(--chrome-muted)]">
-      Made with
-      <span role="img" aria-label="love">💜</span>
-      by
-      <a
-        href="https://mucahid.dev"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="rounded font-semibold text-[var(--chrome-fg)] underline-offset-4 transition hover:opacity-75 hover:underline"
-      >
-        mucahid.dev
-      </a>
-      for
-      <Link href={portalHref} className="rounded font-semibold text-[var(--chrome-fg)] underline-offset-4 transition hover:opacity-75 hover:underline">
-        games.mucahid.dev
-      </Link>
+      {lang === 'tr' ? (
+        <>
+          {portal} için {maker} tarafından {heart} ile yapıldı
+        </>
+      ) : (
+        <>
+          Made with {heart} by {maker} for {portal}
+        </>
+      )}
     </p>
   )
 }
 
 /** Dark footer matching the header; the layout keeps it at the bottom of short pages. */
 export function SiteFooter({ route, onOpenPrivacySettings }: SiteFooterProps) {
-  const columns = footerColumnsFor(site, route, paths)
+  const lang = useLang()
+  const columns = footerColumnsFor(site, route, paths, lang)
 
   return (
     <footer className="mt-auto shrink-0 border-t border-[var(--chrome-border)] bg-[var(--chrome-bg)] text-[var(--chrome-fg)]">
@@ -72,7 +82,7 @@ export function SiteFooter({ route, onOpenPrivacySettings }: SiteFooterProps) {
             <Link href={paths.home()} className="inline-block rounded-lg">
               <Brand size="footer" />
             </Link>
-            <p className="mt-3 max-w-[40ch] text-[0.84rem] leading-relaxed text-[var(--chrome-muted)]">{TAGLINES[site.kind]}</p>
+            <p className="mt-3 max-w-[40ch] text-[0.84rem] leading-relaxed text-[var(--chrome-muted)]">{TAGLINES[site.kind][lang]}</p>
             <p className="mt-4 text-[0.76rem] text-[var(--chrome-muted)]">
               © {new Date().getFullYear()} {site.name}
               {siteConfig.contactEmail && (
@@ -86,7 +96,7 @@ export function SiteFooter({ route, onOpenPrivacySettings }: SiteFooterProps) {
             </p>
           </div>
           {columns.map((column) => (
-            <nav key={column.title} aria-label={`${column.title} links`}>
+            <nav key={column.title} aria-label={`${column.title} ${CHROME.footer.links[lang]}`}>
               <h2 className="text-[0.66rem] font-bold tracking-[0.16em] text-[var(--chrome-muted)] uppercase">{column.title}</h2>
               <ul className="mt-3 grid gap-2">
                 {column.links.map((link) => (
@@ -98,20 +108,20 @@ export function SiteFooter({ route, onOpenPrivacySettings }: SiteFooterProps) {
             </nav>
           ))}
           <div>
-            <h2 className="text-[0.66rem] font-bold tracking-[0.16em] text-[var(--chrome-muted)] uppercase">Privacy</h2>
+            <h2 className="text-[0.66rem] font-bold tracking-[0.16em] text-[var(--chrome-muted)] uppercase">{CHROME.footer.privacy[lang]}</h2>
             <button
               type="button"
               onClick={onOpenPrivacySettings}
               className="mt-3 inline-flex min-h-9 items-center rounded text-[0.84rem] text-[var(--chrome-muted)] underline-offset-4 transition hover:text-[var(--chrome-fg)] hover:underline"
             >
-              Privacy settings
+              {CHROME.footer.privacySettings[lang]}
             </button>
           </div>
         </div>
       </div>
       <div className="border-t border-[var(--chrome-border)]">
         <div className="mx-auto max-w-[1440px] px-4 py-4 sm:px-6 lg:px-8">
-          <MadeWith />
+          <MadeWith lang={lang} />
         </div>
       </div>
     </footer>

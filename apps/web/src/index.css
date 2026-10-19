@@ -143,6 +143,13 @@
   }
 }
 
+/* The portal's featured cards swing round by transitioning this angle on their stage. */
+@property --orbit-turn {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
 /* Semantic tokens are shared by the portal, game, forms, dialogs and canvas.
    No route-specific overrides: a selected theme covers the entire site. */
 :root:not([data-theme='light']) {
@@ -262,19 +269,23 @@
   }
   .portal-hero-orbit-stage.is-orbiting {
     min-height: 360px;
+    transition: --orbit-turn 1.6s cubic-bezier(0.65, 0, 0.35, 1);
   }
   .portal-hero-game-item {
     width: 100%;
   }
+  /* The cards travel a flat ellipse below the headline: the one in front is
+     larger and on top, so the orbit never covers the copy above it. */
   .portal-hero-orbit-stage.is-orbiting .portal-hero-game-item {
+    --orbit-at: calc(var(--orbit-turn) + var(--orbit-angle, 0deg));
     position: absolute;
     inset: 0;
+    z-index: calc(10 + round(sin(var(--orbit-at)) * 10));
     display: grid;
     width: min(310px, 72vw);
     margin: auto;
     place-items: center;
-    animation: portal-card-orbit 24s linear infinite;
-    animation-delay: var(--orbit-delay, 0s);
+    transform: translate(calc(cos(var(--orbit-at)) * clamp(48px, 17vw - 24px, 210px)), calc(sin(var(--orbit-at)) * 22px)) scale(calc(0.86 + 0.07 * (sin(var(--orbit-at)) + 1)));
     transform-origin: center;
   }
   .portal-hero-orbit-stage.is-orbiting .portal-hero-game-item > a {
@@ -348,10 +359,6 @@
     18% { opacity: 0.85; }
     62% { opacity: 0.42; }
     100% { opacity: 0; transform: translate3d(180px, -58px, 0) scale(1.15); }
-  }
-  @keyframes portal-card-orbit {
-    from { transform: rotate(var(--orbit-angle, 0deg)) translateX(clamp(150px, 18vw, 220px)) rotate(calc(-1 * var(--orbit-angle, 0deg))); }
-    to { transform: rotate(calc(var(--orbit-angle, 0deg) + 360deg)) translateX(clamp(150px, 18vw, 220px)) rotate(calc(-1 * (var(--orbit-angle, 0deg) + 360deg))); }
   }
   .daily-card { display: flex; height: 100%; min-height: 300px; flex-direction: column; border: 1px solid var(--color-line); border-radius: 18px; padding: 24px; background: radial-gradient(ellipse at top right, color-mix(in srgb, var(--color-reward) 9%, transparent), transparent 70%), var(--color-surface); transition: border-color 200ms; }
   .daily-card:hover { border-color: var(--color-reward); }

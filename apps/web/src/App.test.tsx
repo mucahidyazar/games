@@ -11,6 +11,8 @@ import { createPlayerStore } from '@/games/trap-the-orb/state/playerStore'
 import { createMemoryStore } from '@/games/trap-the-orb/storage/memoryStore'
 import { installFakeApi } from './test/fakeApi'
 
+vi.mock('@/games/absurd-trolley-problems/scene/TrolleyScene', async () => ({ TrolleyScene: (await import('./test/fakeTrolleyScene')).FakeTrolleyScene }))
+
 const fakeSound = (): SoundPlayer => ({ play: vi.fn(), unlock: vi.fn(), setEnabled: vi.fn() })
 
 function renderApp(path = '/trap-the-orb', store = createPlayerStore(createMemoryStore(), fakeSound())) {
@@ -113,7 +115,7 @@ describe('App', () => {
     renderApp('/trap-the-orb#privacy')
 
     expect(await screen.findByRole('heading', { name: 'Privacy policy' })).toBeInTheDocument()
-    expect(await screen.findByText(/Effective September 30, 2026/)).toBeInTheDocument()
+    expect(await screen.findByText(/Effective October 18, 2026/)).toBeInTheDocument()
   })
 
   it('pauses a running game while a privacy dialog is open', async () => {
@@ -348,6 +350,66 @@ describe('pages', () => {
     })
 
     await waitFor(() => expect(openDialog()).toBeNull())
+  })
+})
+
+describe('Absurd Trolley Problems', () => {
+  afterEach(() => {
+    localStorage.clear()
+    document.documentElement.lang = 'en'
+  })
+
+  it('replaces the shared header with the game’s own and keeps one header', async () => {
+    renderApp('/absurd-trolley-problems')
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Absurd Trolley Problems' })).toBeInTheDocument()
+    expect(screen.getByRole('banner')).toContainElement(screen.getByRole('tablist', { name: 'Game sections' }))
+    expect(screen.getAllByRole('banner')).toHaveLength(1)
+    expect(screen.queryByRole('navigation', { name: 'Main' })).not.toBeInTheDocument()
+    expect(within(screen.getByRole('banner')).getByRole('link', { name: 'All games' })).toHaveAttribute('href', '/')
+  })
+
+  it('asks who’s playing before the first dilemma', async () => {
+    const { user } = renderApp('/absurd-trolley-problems')
+
+    expect(await screen.findByRole('heading', { level: 2, name: /Who’s playing\?/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Pull the lever' })).not.toBeInTheDocument()
+    await user.click(await screen.findByRole('button', { name: 'Start' }))
+    expect(await screen.findByRole('heading', { level: 2, name: /Which problems\?/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Absurd dilemmas' }))
+    expect(await screen.findByRole('button', { name: 'Pull the lever' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Switch player (Player 1)' })).toBeInTheDocument()
+  })
+
+  it('opens its own How to play and goes back to the shared header elsewhere', async () => {
+    renderApp('/absurd-trolley-problems')
+    await screen.findByRole('heading', { level: 1, name: 'Absurd Trolley Problems' })
+
+    act(() => navigate('/absurd-trolley-problems#how-to-play'))
+    const dialog = await screen.findByRole('dialog', { name: 'How to play' })
+    expect(await within(dialog).findByText(/runaway tram/)).toBeInTheDocument()
+    act(() => navigate('/about'))
+    expect(await screen.findAllByRole('navigation', { name: 'Main' })).not.toHaveLength(0)
+    expect(screen.queryByRole('tablist', { name: 'Game sections' })).not.toBeInTheDocument()
+  })
+})
+
+describe('site language', () => {
+  afterEach(() => {
+    localStorage.clear()
+    document.documentElement.lang = 'en'
+  })
+
+  it('offers TR | EN on the home page and translates it', async () => {
+    const { user } = renderApp('/')
+
+    const group = await screen.findByRole('group', { name: 'Language' })
+    await user.click(within(group).getByRole('button', { name: 'TR' }))
+
+    expect(await screen.findByRole('heading', { level: 1, name: /Anında oyna/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Oyunlar' }).length).toBeGreaterThan(0)
+    expect(document.documentElement.lang).toBe('tr')
+    expect(screen.getByRole('heading', { name: 'Sıradaki favorini bul' })).toBeInTheDocument()
   })
 })
 

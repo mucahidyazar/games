@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useLang } from '@/app/lang'
 import { siteConfig } from '@/lib/site'
 import { logger } from '@/lib/logger'
 import { loadAdSense } from './adsense'
@@ -48,6 +49,7 @@ function AdSenseUnit({ client, slot }: AdSenseUnitProps) {
 }
 
 function AdPlaceholder() {
+  const lang = useLang()
   const subject = encodeURIComponent(`${new URL(siteConfig.url).hostname} — Advertising inquiry`)
   const body = encodeURIComponent(`Hello,\n\nI'd like to advertise on ${siteConfig.url}.\n\nBrand / website:\nCampaign duration:\nMessage:\n`)
   return (
@@ -56,8 +58,8 @@ function AdPlaceholder() {
       className="grid min-h-[250px] place-items-center rounded-[8px] border border-dashed border-line-strong bg-page px-6 py-5 text-center transition hover:border-action focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action"
     >
       <div>
-        <p className="text-[0.82rem] font-semibold text-ink-soft">Advertise here</p>
-        <p className="mt-0.5 text-[0.7rem] text-subtle">Email us about advertising and sponsorship</p>
+        <p className="text-[0.82rem] font-semibold text-ink-soft">{lang === 'tr' ? 'Burada reklam verin' : 'Advertise here'}</p>
+        <p className="mt-0.5 text-[0.7rem] text-subtle">{lang === 'tr' ? 'Reklam ve sponsorluk için bize e-posta gönderin' : 'Email us about advertising and sponsorship'}</p>
       </div>
     </a>
   )

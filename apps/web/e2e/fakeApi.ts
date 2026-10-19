@@ -14,6 +14,8 @@ export interface FakeApiOptions {
 export interface FakeApi {
   readonly startedRuns: unknown[]
   readonly finishedRuns: Array<{ readonly runId: string; readonly body: Record<string, unknown> }>
+  /** Absurd Trolley Problems votes, as sent. */
+  readonly trolleyVotes: Array<{ readonly dilemmaId: string; readonly choice: 'pull' | 'stay'; readonly voterId: string }>
 }
 
 const USER = {
@@ -62,7 +64,8 @@ const LEADERBOARD_ENTRIES = [
 ]
 
 export async function mockApi(page: Page, { signedIn = false, nickname = 'Luna' }: FakeApiOptions = {}): Promise<FakeApi> {
-  const api: FakeApi = { startedRuns: [], finishedRuns: [] }
+  const api: FakeApi = { startedRuns: [], finishedRuns: [], trolleyVotes: [] }
+  const tallies: Record<string, { pull: number; stay: number }> = { 'influencers-vs-last-cat': { pull: 63, stay: 36 } }
 
   await page.route('**/api/**', async (route) => {
     const request = route.request()
@@ -72,6 +75,14 @@ export async function mockApi(page: Page, { signedIn = false, nickname = 'Luna' 
       route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) })
 
     if (pathname === '/api/config') return json({ auth: { google: true, email: true } })
+    if (pathname === '/api/trolley/tallies') return json({ tallies })
+    if (pathname === '/api/trolley/votes' && method === 'POST') {
+      const vote = request.postDataJSON() as FakeApi['trolleyVotes'][number]
+      api.trolleyVotes.push(vote)
+      const tally = tallies[vote.dilemmaId] ?? { pull: 0, stay: 0 }
+      tallies[vote.dilemmaId] = { ...tally, [vote.choice]: tally[vote.choice] + 1 }
+      return json({ dilemmaId: vote.dilemmaId, tally: tallies[vote.dilemmaId] })
+    }
     if (pathname === '/api/auth/get-session') return json(signedIn ? SESSION : null)
     if (pathname === '/api/me') {
       if (!signedIn) return json({ error: { code: 'unauthorized', message: 'Sign in first.' } }, 401)

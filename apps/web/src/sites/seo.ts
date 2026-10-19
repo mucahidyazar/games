@@ -55,7 +55,7 @@ function videoGameJsonLd(game: GameEntry, url: string, siteUrl: string): Record<
     url,
     description: game.description,
     image: `${siteUrl}${game.cover}`,
-    genre: [gameById(game.id).tags[0] ?? 'Arcade'],
+    genre: [game.tags[0] ?? 'Arcade'],
     gamePlatform: 'Web browser',
     applicationCategory: 'GameApplication',
     operatingSystem: 'Any',
@@ -71,7 +71,7 @@ function portalSeo(): SiteSeo {
   return {
     title: 'games.mucahid.dev — Free browser games',
     description:
-      'Free games that run right in your browser — no download, no sign-up needed. Play Trap The Orb, climb the leaderboards and earn badges.',
+      'Free games that run right in your browser — no download, no sign-up needed. Play Trap The Orb and Absurd Trolley Problems, climb the leaderboards and earn badges.',
     ogTitle: 'games.mucahid.dev — Free browser games',
     ogDescription: 'Small, sharp games you can play in seconds. No download, no sign-up needed.',
     ogImage: GAMES[0]?.cover ?? '/og-image.png',
@@ -87,7 +87,7 @@ function portalSeo(): SiteSeo {
       { path: paths.about(), changefreq: 'monthly', priority: '0.5' },
       ...GAMES.flatMap((game): SitemapPage[] => [
         { path: paths.game(game.id), changefreq: 'weekly', priority: '0.9' },
-        { path: paths.leaderboards(game.id), changefreq: 'daily', priority: '0.6' },
+        ...(game.hasLeaderboards ? [{ path: paths.leaderboards(game.id), changefreq: 'daily', priority: '0.6' } as const] : []),
       ]),
     ],
     notFound: {

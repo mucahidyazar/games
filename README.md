@@ -1,10 +1,12 @@
 # Mucahid Games
 
-The browser game portal at [games.mucahid.dev](https://games.mucahid.dev), with a shared header, footer and account system. The first game is Trap The Orb; the same game can also be built for its own domain.
+The browser game portal at [games.mucahid.dev](https://games.mucahid.dev), with a shared header, footer and account system, in English and Turkish. It has two games: Trap The Orb, which can also be built for its own domain, and Absurd Trolley Problems.
 
 Trap The Orb is a free browser arcade game made for quick sessions. Orbs bounce around the field, and you build walls to trap them in smaller and smaller spaces. Claim at least 75% of the field to clear a level. Anyone can play straight away as a guest; signing in (Google or a code sent by email) puts ranked runs on global leaderboards, keeps records and earns badges. It plays with a mouse, a keyboard or a touch screen. Mobile apps for iOS and Android are coming soon.
 
 Play through the portal at [games.mucahid.dev/trap-the-orb](https://games.mucahid.dev/trap-the-orb), or publish the standalone build at [traptheorb.com](https://traptheorb.com).
+
+Absurd Trolley Problems is a pixel-art 3D take on the trolley problem: a runaway tram, a lever and two chapters of twelve dilemmas, from five influencers against the last cat on Earth to multi-track drifting. Pull the lever (A, the button or the lever in the scene itself) or do nothing (D), watch what happens, then see how everyone else voted. Votes are anonymous; each chapter ends with the lives lost and a moral profile. It opens on “Who’s playing?”: everyone on a device (a partner, a parent, a flatmate) can start their own game, and the Compare tab shows two players’ choices side by side. Then comes the choice of problems: the absurd dilemmas, or the original ones, the twenty-one choices in Philippa Foot’s 1967 essay where the trolley problem began, drawn as SVG motion graphics, each with Foot’s own answer and reasoning, and an end card that groups your calls by the line she draws between harming and helping; the four operations of the abortion debate are played without a victim count, since whether the unborn should count is the debate itself. It plays at [games.mucahid.dev/absurd-trolley-problems](https://games.mucahid.dev/absurd-trolley-problems), in its own header, with the scene and its models made in Blender (see [`apps/web/blender`](apps/web/blender/absurd-trolley-problems)).
 
 ## Repository
 
@@ -15,7 +17,7 @@ A pnpm workspace. More games can join later: they share the API and the `core` d
 | [`apps/web`](apps/web) | The site: React 19, Vite 8, Tailwind CSS v4, TanStack Query, Better Auth client. |
 | [`apps/api`](apps/api) | The server: Hono, Better Auth (Google + email codes through Resend), Drizzle on Postgres. Verifies ranked runs by replaying them. See [its README](apps/api/README.md). |
 | [`packages/trap-the-orb-engine`](packages/trap-the-orb-engine) | The pure, deterministic game engine shared by the browser and the server: field, orbs, walls, capture, levels, modes, scoring, stats, badges and replay. |
-| [`packages/contract`](packages/contract) | Request and response schemas (Zod) and leaderboard definitions shared by the site and the API. |
+| [`packages/contract`](packages/contract) | Request and response schemas (Zod), leaderboard definitions and the trolley dilemma ids (the absurd ones and Philippa Foot's) shared by the site and the API. |
 
 ## Getting started
 
