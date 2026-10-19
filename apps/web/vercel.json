@@ -47,15 +47,15 @@
   "rewrites": [
     {
       "source": "/profile",
-      "destination": "/index.html"
+      "destination": "/profile.html"
     },
     {
       "source": "/about",
-      "destination": "/index.html"
+      "destination": "/about.html"
     },
     {
       "source": "/leaderboards",
-      "destination": "/index.html"
+      "destination": "/leaderboards.html"
     },
     {
       "source": "/play/:mode",
@@ -63,19 +63,19 @@
     },
     {
       "source": "/trap-the-orb",
-      "destination": "/index.html"
+      "destination": "/trap-the-orb.html"
     },
     {
       "source": "/trap-the-orb/leaderboards",
-      "destination": "/index.html"
+      "destination": "/trap-the-orb/leaderboards.html"
     },
     {
       "source": "/trap-the-orb/play/:mode",
-      "destination": "/index.html"
+      "destination": "/trap-the-orb.html"
     },
     {
       "source": "/absurd-trolley-problems",
-      "destination": "/index.html"
+      "destination": "/absurd-trolley-problems.html"
     }
   ]
 }

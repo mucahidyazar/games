@@ -21,7 +21,7 @@ export const CACHE_SHORT = 'public, max-age=3600'
 
 export type StaticRoute =
   | { readonly kind: 'file'; readonly path: string }
-  | { readonly kind: 'app' }
+  | { readonly kind: 'app'; readonly path: string }
   | { readonly kind: 'missing' }
 
 export function isAppRoute(pathname: string): boolean {
@@ -44,11 +44,24 @@ export function safeFilePath(pathname: string): string | null {
   }
 }
 
-/** Which response a GET for `pathname` gets: a real file, the app shell, or the 404 page. */
+/**
+ * The HTML for an app route. The web build writes each page its own copy of
+ * index.html, with that page's title and link preview (`/trap-the-orb` →
+ * `/trap-the-orb.html`); a deeper route without one (a game mode) gets its
+ * nearest parent's, and the rest index.html.
+ */
+export function appPageFor(pathname: string, isFile: (path: string) => boolean): string {
+  for (let path = safeFilePath(pathname.replace(/\/+$/, '')) ?? ''; path.length > 1; path = path.slice(0, path.lastIndexOf('/'))) {
+    if (isFile(`${path}.html`)) return `${path}.html`
+  }
+  return '/index.html'
+}
+
+/** Which response a GET for `pathname` gets: a real file, the app's page, or the 404 page. */
 export function routeStatic(pathname: string, isFile: (path: string) => boolean): StaticRoute {
   const path = safeFilePath(pathname)
   if (path && path !== '/' && !path.endsWith('/') && isFile(path)) return { kind: 'file', path }
-  return isAppRoute(pathname) ? { kind: 'app' } : { kind: 'missing' }
+  return isAppRoute(pathname) ? { kind: 'app', path: appPageFor(pathname, isFile) } : { kind: 'missing' }
 }
 
 /** Hashed Vite assets never change; HTML must be revalidated; other files may be cached briefly. */
@@ -80,8 +93,8 @@ async function sendFile(c: Context, root: string, path: string, status: 200 | 40
 }
 
 /**
- * Serves the built web app (production): real files first, index.html for
- * the app's routes, and 404.html with a 404 status for everything else.
+ * Serves the built web app (production): real files first, each app route's
+ * page, and 404.html with a 404 status for everything else.
  * API paths are never handled here.
  */
 export function staticSite(dir: string): MiddlewareHandler {
@@ -102,7 +115,7 @@ export function staticSite(dir: string): MiddlewareHandler {
 
     const route = routeStatic(c.req.path, isFile)
     if (route.kind === 'file') return sendFile(c, root, route.path, 200)
-    if (route.kind === 'app') return sendFile(c, root, '/index.html', 200)
+    if (route.kind === 'app') return sendFile(c, root, route.path, 200)
     if (isFile('/404.html')) return sendFile(c, root, '/404.html', 404)
     return c.text('Not found', 404, { ...SITE_SECURITY_HEADERS })
   }

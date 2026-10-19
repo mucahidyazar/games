@@ -82,7 +82,7 @@ export const GAMES: readonly GameEntry[] = [
     name: 'Absurd Trolley Problems',
     tagline: 'Pull the lever. Or don’t.',
     description:
-      'A runaway tram, a lever and twenty-four increasingly absurd moral dilemmas in a 3D pixel-art night. Decide, then see how the rest of the world voted.',
+      'A runaway tram, a lever and 24 absurd dilemmas in a 3D pixel-art night, plus 21 cases from Philippa Foot’s 1967 essay. Decide, then see how others voted.',
     category: 'casual',
     tags: ['Casual', '3D', 'Community votes'],
     highlights: ['24 absurd dilemmas', 'Live community votes', 'Turkish & English'],

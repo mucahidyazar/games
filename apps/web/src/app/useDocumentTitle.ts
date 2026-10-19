@@ -42,7 +42,8 @@ export function updateDocumentMetadata(route: Route, site: Site, siteUrl: string
   meta('name', 'apple-mobile-web-app-title', site.name)
   meta('property', 'og:site_name', site.name)
   meta('property', 'og:url', page.canonical)
-  for (const [key, content] of Object.entries({ title: page.title, description: page.description, image: page.image, 'image:alt': page.imageAlt })) {
+  meta('property', 'og:image:type', page.imageType)
+  for (const [key, content] of Object.entries({ title: page.shareTitle, description: page.shareDescription, image: page.image, 'image:alt': page.imageAlt })) {
     meta('property', `og:${key}`, content)
     meta('name', `twitter:${key}`, content)
   }
@@ -51,6 +52,10 @@ export function updateDocumentMetadata(route: Route, site: Site, siteUrl: string
   link('apple-touch-icon', seo.appleTouchIcon)
   link('manifest', seo.manifest)
   let jsonLd = document.head.querySelector<HTMLScriptElement>('script[type="application/ld+json"]')
+  if (page.jsonLd === null) {
+    jsonLd?.remove()
+    return
+  }
   if (!jsonLd) {
     jsonLd = document.createElement('script')
     jsonLd.type = 'application/ld+json'

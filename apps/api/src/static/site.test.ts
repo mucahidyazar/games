@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { SITE_SECURITY_HEADERS } from './security-headers'
-import { CACHE_IMMUTABLE, CACHE_REVALIDATE, CACHE_SHORT, cacheControlFor, isAppRoute, routeStatic, safeFilePath, SPA_ROUTES } from './site'
+import { appPageFor, CACHE_IMMUTABLE, CACHE_REVALIDATE, CACHE_SHORT, cacheControlFor, isAppRoute, routeStatic, safeFilePath, SPA_ROUTES } from './site'
 
 const VERCEL_JSON = fileURLToPath(new URL('../../../web/vercel.json', import.meta.url))
 
@@ -44,12 +44,37 @@ describe('routeStatic', () => {
   })
 
   it('serves the app shell for app routes and the 404 page for the rest', () => {
-    expect(routeStatic('/', isFile)).toEqual({ kind: 'app' })
-    expect(routeStatic('/play/zen', isFile)).toEqual({ kind: 'app' })
-    expect(routeStatic('/trap-the-orb/play/zen', isFile)).toEqual({ kind: 'app' })
-    expect(routeStatic('/trap-the-orb/leaderboards', isFile)).toEqual({ kind: 'app' })
+    expect(routeStatic('/', isFile)).toEqual({ kind: 'app', path: '/index.html' })
+    expect(routeStatic('/play/zen', isFile)).toEqual({ kind: 'app', path: '/index.html' })
+    expect(routeStatic('/trap-the-orb/play/zen', isFile)).toEqual({ kind: 'app', path: '/index.html' })
+    expect(routeStatic('/trap-the-orb/leaderboards', isFile)).toEqual({ kind: 'app', path: '/index.html' })
     expect(routeStatic('/assets/missing.js', isFile)).toEqual({ kind: 'missing' })
     expect(routeStatic('/../index.html', isFile)).toEqual({ kind: 'missing' })
+  })
+})
+
+describe('appPageFor', () => {
+  // The portal build: each page has its own copy of index.html, with its own link preview.
+  const files = new Set(['/index.html', '/about.html', '/trap-the-orb.html', '/trap-the-orb/leaderboards.html', '/absurd-trolley-problems.html'])
+  const isFile = (path: string) => files.has(path)
+
+  it('serves each page its own HTML', () => {
+    expect(appPageFor('/absurd-trolley-problems', isFile)).toBe('/absurd-trolley-problems.html')
+    expect(appPageFor('/absurd-trolley-problems/', isFile)).toBe('/absurd-trolley-problems.html')
+    expect(appPageFor('/trap-the-orb/leaderboards', isFile)).toBe('/trap-the-orb/leaderboards.html')
+    expect(appPageFor('/about', isFile)).toBe('/about.html')
+    expect(routeStatic('/trap-the-orb', isFile)).toEqual({ kind: 'app', path: '/trap-the-orb.html' })
+  })
+
+  it('serves a game mode its game’s page, and the rest index.html', () => {
+    expect(appPageFor('/trap-the-orb/play/daily', isFile)).toBe('/trap-the-orb.html')
+    expect(appPageFor('/', isFile)).toBe('/index.html')
+    expect(appPageFor('/profile', isFile)).toBe('/index.html')
+    expect(appPageFor('/play/zen', isFile)).toBe('/index.html')
+  })
+
+  it('still serves a page file asked for by name', () => {
+    expect(routeStatic('/trap-the-orb.html', isFile)).toEqual({ kind: 'file', path: '/trap-the-orb.html' })
   })
 })
 

@@ -57,6 +57,10 @@ VITE_SITE=traptheorb VITE_SITE_URL= pnpm --filter web build
 
 The commands overwrite `dist`; publish each build to its matching domain. Browser hostname detection switches the UI and document metadata, while the initial HTML, robots/sitemap and static 404 come from the build selection. In development, Vite proxies `/api` to `http://localhost:${API_PORT}` (default 3102).
 
+### Link previews
+
+Chat apps and social sites read a shared link's HTML without running the app, so the build writes every page its own copy of `index.html`, with that page's title, description, canonical URL and Open Graph/X card: `/absurd-trolley-problems` is `absurd-trolley-problems.html`, `/trap-the-orb/leaderboards` is `trap-the-orb/leaderboards.html`. The API's static server and the `vercel.json` rewrites serve them; a route without its own page (a game mode) gets its nearest parent's. The dev server fills in the same head for whichever page it serves. Each game page shows the game's cover; the portal shows `public/portal/og-image.jpg`, which `node apps/web/scripts/capture-portal-art.mjs` renders from the covers. Preview images are 1200 × 630 and stay under 300 KB, which a test checks. Sites cache previews, so a changed one may take a while to show (Facebook's Sharing Debugger refreshes it at once).
+
 ## Google AdSense
 
 1. In AdSense, create a display ad unit for a 300×250 rectangle.
@@ -87,10 +91,11 @@ src/
 └── test/                Test setup, fake API, build-plugin tests
 e2e/                     Playwright specs
 blender/                 Blender scripts that build Absurd Trolley Problems' models
-vite-plugins/            Site-specific HTML metadata, robots.txt, sitemap.xml, ads.txt and 404.html
-public/                  Icons, Open Graph image, game/portal manifests, _headers
+vite-plugins/            Each page's HTML and link preview, robots.txt, sitemap.xml, ads.txt and 404.html
+scripts/                 Renders the link preview art (the portal's card, the trolley cover)
+public/                  Icons, link preview images, game/portal manifests, _headers
 ```
 
 ## Adding another game
 
-Add its catalogue entry in `src/sites/games.ts` (with its Turkish tagline, tags and highlights) and implementation under `src/games/`. Add a site in `src/sites/sites.ts` when it gets its own domain, and register its screen in the app. The catalogue drives portal links and sitemap entries; `hasLeaderboards` and `hasMobileApp` decide whether those pages and links exist, and `hasCustomHeader` lets the game draw its own header (see above). Keep the API static route allowlist (`apps/api/src/static/site.ts`) and any static-host rewrites (`vercel.json`) in sync with the new game prefix. Shared layout components take their brand and links from the resolved site.
+Add its catalogue entry in `src/sites/games.ts` (with its Turkish tagline, tags and highlights) and implementation under `src/games/`. Add a site in `src/sites/sites.ts` when it gets its own domain, and register its screen in the app. The catalogue drives portal links and sitemap entries; `hasLeaderboards` and `hasMobileApp` decide whether those pages and links exist, and `hasCustomHeader` lets the game draw its own header (see above). Its `cover` is its link preview (1200 × 630, under 300 KB); rerun `scripts/capture-portal-art.mjs`, which reads the catalogue, so the portal's card shows it too. Keep the API static route allowlist (`apps/api/src/static/site.ts`) and any static-host rewrites (`vercel.json`, pointing at the game's own page, `/<game>.html`) in sync with the new game prefix. Shared layout components take their brand and links from the resolved site.

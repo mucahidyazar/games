@@ -74,8 +74,8 @@ function portalSeo(): SiteSeo {
       'Free games that run right in your browser — no download, no sign-up needed. Play Trap The Orb and Absurd Trolley Problems, climb the leaderboards and earn badges.',
     ogTitle: 'games.mucahid.dev — Free browser games',
     ogDescription: 'Small, sharp games you can play in seconds. No download, no sign-up needed.',
-    ogImage: GAMES[0]?.cover ?? '/og-image.png',
-    ogImageAlt: 'Play Trap The Orb and discover free browser games on games.mucahid.dev.',
+    ogImage: '/portal/og-image.jpg',
+    ogImageAlt: `games.mucahid.dev: “Play in seconds. Make it count.” beside the covers of ${GAMES.map((game) => game.name).join(' and ')}.`,
     favicon: '/portal/favicon.svg',
     icon192: '/icon-192.png',
     appleTouchIcon: '/apple-touch-icon.png',
@@ -197,54 +197,93 @@ export interface PageSeo {
   readonly title: string
   readonly description: string
   readonly canonical: string
+  /** The link preview (Open Graph and X cards): what chat apps and social sites show for a shared link. */
+  readonly shareTitle: string
+  readonly shareDescription: string
+  /** Absolute URL of a 1200 × 630 image. */
   readonly image: string
+  readonly imageType: string
   readonly imageAlt: string
   readonly robots: 'index,follow' | 'noindex,follow'
+  /** Structured data, or null for pages without any. */
   readonly jsonLd: unknown
+}
+
+const IMAGE_TYPES: Readonly<Record<string, string>> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp' }
+
+/** The media type of an image, from its file extension. */
+export function imageTypeOf(path: string): string {
+  const type = IMAGE_TYPES[/\.(\w+)$/.exec(path)?.[1]?.toLowerCase() ?? '']
+  if (!type) throw new Error(`No image type for ${path}`)
+  return type
+}
+
+/** A page the build writes its own HTML for, so links to it get its own title and preview without running the app. */
+export interface StaticPage {
+  readonly path: string
+  readonly route: Route
+}
+
+/**
+ * The site's pages that get their own HTML. Deeper routes without one (a
+ * game mode, `/trap-the-orb/play/daily`) are served their nearest parent's.
+ */
+export function staticPagesFor(site: Site): readonly StaticPage[] {
+  const paths = createPaths(site)
+  const games = site.kind === 'game' ? [gameById(site.game)] : GAMES
+  const pages: StaticPage[] = [
+    site.kind === 'game' ? { path: '/', route: { page: 'play', game: site.game, mode: null } } : { path: '/', route: { page: 'home' } },
+    { path: paths.about(), route: { page: 'about' } },
+    { path: paths.profile(), route: { page: 'profile' } },
+    ...games.flatMap((game): StaticPage[] => [
+      { path: paths.game(game.id), route: { page: 'play', game: game.id, mode: null } },
+      ...(game.hasLeaderboards ? [{ path: paths.leaderboards(game.id), route: { page: 'leaderboards', game: game.id } } as const] : []),
+    ]),
+  ]
+  // On a game's own site the game is the home page.
+  return pages.filter((page, index) => pages.findIndex((other) => other.path === page.path) === index)
 }
 
 /** Canonical game URLs omit mode/query variants; personal and missing pages are not indexed. */
 export function pageSeoFor(route: Route, site: Site, siteUrl = site.url): PageSeo {
   const seo = seoFor(site)
   const paths = createPaths(site)
-  const base = {
-    title: seo.title,
-    description: seo.description,
-    canonical: `${siteUrl}/`,
-    image: `${siteUrl}${seo.ogImage}`,
-    imageAlt: seo.ogImageAlt,
-    robots: 'index,follow' as const,
-    jsonLd: seo.jsonLd(siteUrl),
-  }
+  const page = (title: string, description: string, canonical: string, image = seo.ogImage, imageAlt = seo.ogImageAlt): PageSeo => ({
+    title,
+    description,
+    canonical: `${siteUrl}${canonical}`,
+    shareTitle: title,
+    shareDescription: description,
+    image: `${siteUrl}${image}`,
+    imageType: imageTypeOf(image),
+    imageAlt,
+    robots: 'index,follow',
+    jsonLd: null,
+  })
+  const home = (): PageSeo => ({ ...page(seo.title, seo.description, '/'), shareTitle: seo.ogTitle, shareDescription: seo.ogDescription, jsonLd: seo.jsonLd(siteUrl) })
   switch (route.page) {
     case 'home':
-      return base
+      return home()
     case 'play': {
+      // On a game's own site the game is the home page.
+      if (site.kind === 'game') return home()
       const game = gameById(route.game)
-      const canonical = `${siteUrl}${paths.game(game.id)}`
+      const canonical = paths.game(game.id)
       return {
-        ...base,
-        title: site.kind === 'game' ? seo.title : `${game.name} — ${site.name}`,
-        description: game.description,
-        canonical,
-        image: `${siteUrl}${game.cover}`,
-        imageAlt: game.coverAlt,
-        jsonLd: { '@context': 'https://schema.org', ...videoGameJsonLd(game, canonical, siteUrl) },
+        ...page(`${game.name} — ${site.name}`, game.description, canonical, game.cover, game.coverAlt),
+        shareTitle: `${game.name} — ${game.tagline}`,
+        jsonLd: { '@context': 'https://schema.org', ...videoGameJsonLd(game, `${siteUrl}${canonical}`, siteUrl) },
       }
     }
-    case 'leaderboards':
-      return {
-        ...base,
-        title: `Leaderboards — ${gameById(route.game).name}`,
-        description: `Explore ${gameById(route.game).name} high scores, daily challenges and player records.`,
-        canonical: `${siteUrl}${paths.leaderboards(route.game)}`,
-        jsonLd: null,
-      }
+    case 'leaderboards': {
+      const game = gameById(route.game)
+      return page(`Leaderboards — ${game.name}`, `Explore ${game.name} high scores, daily challenges and player records.`, paths.leaderboards(game.id), game.cover, game.coverAlt)
+    }
     case 'profile':
-      return { ...base, title: `Your profile — ${site.name}`, canonical: `${siteUrl}${paths.profile()}`, robots: 'noindex,follow', jsonLd: null }
+      return { ...page(`Your profile — ${site.name}`, seo.description, paths.profile()), robots: 'noindex,follow' }
     case 'about':
-      return { ...base, title: `About ${site.name}`, description: `Learn more about ${site.name} and the games made by Mucahid.`, canonical: `${siteUrl}${paths.about()}`, jsonLd: null }
+      return page(`About ${site.name}`, `Learn more about ${site.name} and the games made by Mucahid.`, paths.about())
     case 'notFound':
-      return { ...base, title: seo.notFound.title, description: seo.notFound.description, robots: 'noindex,follow', jsonLd: null }
+      return { ...page(seo.notFound.title, seo.notFound.description, '/'), robots: 'noindex,follow' }
   }
 }
