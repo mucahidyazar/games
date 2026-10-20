@@ -37,7 +37,7 @@ export function createApp(deps: AppDeps): Hono<AppEnv> {
   const finishLimit = bodyLimit({ maxSize: FINISH_BODY_LIMIT, onError: payloadTooLarge })
   const defaultLimit = bodyLimit({ maxSize: DEFAULT_BODY_LIMIT, onError: payloadTooLarge })
 
-  app.use('/api/*', clientIp(deps.config.trustProxy))
+  app.use('/api/*', clientIp(deps.config.trustProxy, deps.logger))
   app.use('/api/*', secureHeaders())
   app.use('/api/*', async (c, next) => {
     await next()

@@ -1,5 +1,35 @@
+import { Hono } from 'hono'
 import { describe, expect, it } from 'vitest'
-import { resolveClientIp } from './client-ip'
+import { createLogger } from '../logger'
+import { clientIp, resolveClientIp } from './client-ip'
+import type { AppEnv } from './context'
+
+describe('clientIp', () => {
+  function appTrusting(trustProxy: number) {
+    const lines: string[] = []
+    const app = new Hono<AppEnv>()
+    app.use('*', clientIp(trustProxy, createLogger({ level: 'warn', sink: (line) => lines.push(line) })))
+    app.get('/', (c) => c.text(c.get('clientIp') ?? 'unknown'))
+    return { app, lines }
+  }
+
+  it('warns once when a proxy passes the visitor’s address on but no proxy is trusted', async () => {
+    const { app, lines } = appTrusting(0)
+    await app.request('/')
+    expect(lines).toEqual([])
+    await app.request('/', { headers: { 'X-Forwarded-For': '203.0.113.7' } })
+    await app.request('/', { headers: { 'X-Forwarded-For': '198.51.100.9' } })
+    expect(lines).toHaveLength(1)
+    expect(lines[0]).toContain('TRUST_PROXY is 0')
+  })
+
+  it('stays quiet behind a trusted proxy, and uses the address it passed on', async () => {
+    const { app, lines } = appTrusting(1)
+    const response = await app.request('/', { headers: { 'X-Forwarded-For': '203.0.113.7' } })
+    expect(await response.text()).toBe('203.0.113.7')
+    expect(lines).toEqual([])
+  })
+})
 
 describe('resolveClientIp', () => {
   it('uses the socket address when no proxy is trusted, ignoring X-Forwarded-For', () => {

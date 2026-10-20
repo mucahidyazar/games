@@ -47,6 +47,26 @@ describe('createErrorHandler', () => {
     expect(lines.join('')).toContain('unhandled error')
   })
 
+  it('logs rate limiting at most once a minute per path, with how many requests it turned away', async () => {
+    const lines: string[] = []
+    let now = 0
+    const app = new Hono()
+    app.onError(createErrorHandler(createLogger({ level: 'warn', sink: (line) => lines.push(line) }), () => now))
+    app.post('/api/trolley/votes', () => {
+      throw new HttpError(429, 'rate_limited', 'Too many requests.', { 'Retry-After': '30' })
+    })
+    const vote = () => app.request('/api/trolley/votes', { method: 'POST' })
+
+    expect((await vote()).status).toBe(429)
+    await vote()
+    await vote()
+    now = 60_000
+    await vote()
+    expect(lines).toHaveLength(2)
+    expect(JSON.parse(lines[0] ?? '{}')).toMatchObject({ level: 'warn', msg: 'rate limited', path: '/api/trolley/votes', requests: 1 })
+    expect(JSON.parse(lines[1] ?? '{}')).toMatchObject({ requests: 3 })
+  })
+
   it('answers unknown routes with a JSON 404', async () => {
     const response = await appThrowing(null).app.request('/missing')
     expect(response.status).toBe(404)

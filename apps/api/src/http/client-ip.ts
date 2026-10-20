@@ -1,6 +1,7 @@
 import { isIP } from 'node:net'
 import { getConnInfo } from '@hono/node-server/conninfo'
 import type { Context, MiddlewareHandler } from 'hono'
+import type { Logger } from '../logger'
 import type { AppEnv } from './context'
 
 const IPV4_MAPPED_PREFIX = '::ffff:'
@@ -45,9 +46,16 @@ function socketAddress(c: Context): string | undefined {
   }
 }
 
-export function clientIp(trustProxy: number): MiddlewareHandler<AppEnv> {
+export function clientIp(trustProxy: number, logger?: Logger): MiddlewareHandler<AppEnv> {
+  let warned = false
   return async (c, next) => {
-    c.set('clientIp', resolveClientIp({ forwardedFor: c.req.header('x-forwarded-for'), remoteAddress: socketAddress(c), trustProxy }))
+    const forwardedFor = c.req.header('x-forwarded-for')
+    if (trustProxy === 0 && forwardedFor && !warned) {
+      // Behind a proxy every request comes from the proxy's address, so all visitors would share one budget.
+      warned = true
+      logger?.warn('X-Forwarded-For arrived but TRUST_PROXY is 0: if a proxy is in front of the API, set TRUST_PROXY to their number, or every visitor shares one rate-limit bucket')
+    }
+    c.set('clientIp', resolveClientIp({ forwardedFor, remoteAddress: socketAddress(c), trustProxy }))
     await next()
   }
 }

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { installFakeApi } from '@/test/fakeApi'
 import { FakeTrolleyScene } from '@/test/fakeTrolleyScene'
+import { OUTBOX_KEY } from '../api/voteOutbox'
 import { CHAPTERS } from '../content/dilemmas'
 import { PLAYERS_KEY } from '../state/players'
 import { PROGRESS_KEY } from '../state/progress'
@@ -483,6 +484,50 @@ describe('TrolleyGame', () => {
     expect(await screen.findByText(/Their followers are still waiting/)).toBeInTheDocument()
     // The vote failed, but the player still sees their own.
     await waitFor(() => expect(screen.getByText(/0% of the community pulled the lever\./)).toBeInTheDocument())
+  })
+
+  it('keeps a vote the server did not get, and sends it again', async () => {
+    const fetchMock = installFakeApi({ trolleyTallies: { 'influencers-vs-last-cat': { pull: 63, stay: 36 } }, droppedVotes: 1 })
+    const votes = () => fetchMock.mock.calls.filter(([input]) => String(input).includes('/api/trolley/votes'))
+    const { user } = await renderGame()
+    await waitFor(() => expect(FakeTrolleyScene.instances.length).toBe(1))
+
+    await user.click(screen.getByRole('button', { name: 'Pull the lever' }))
+    // The vote is lost on the way, but the player still sees it counted, and it waits on the device.
+    expect(await screen.findByText(/64% of the community pulled the lever\./)).toBeInTheDocument()
+    await waitFor(() => expect(votes()).toHaveLength(1))
+    // Let the failed request settle before the connection "comes back".
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    })
+    expect(JSON.parse(localStorage.getItem(OUTBOX_KEY) ?? '{}')).toMatchObject({ votes: [{ dilemmaId: 'influencers-vs-last-cat', choice: 'pull' }] })
+
+    act(() => {
+      window.dispatchEvent(new Event('online'))
+    })
+    await waitFor(() => expect(votes()).toHaveLength(2))
+    await waitFor(() => expect(JSON.parse(localStorage.getItem(OUTBOX_KEY) ?? '{}')).toMatchObject({ votes: [] }))
+    expect(screen.getByText(/100 votes/)).toBeInTheDocument()
+  })
+
+  it('sends the answers saved before once more, and only once', async () => {
+    const fetchMock = installFakeApi()
+    const votes = () => fetchMock.mock.calls.filter(([input]) => String(input).includes('/api/trolley/votes')).map(([, init]) => JSON.parse(String(init?.body)) as unknown)
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify({ chapter: 0, index: 1, answers: { 'influencers-vs-last-cat': 'pull' }, foot: 2, voterId: VOTER }))
+    const first = await renderGame()
+    await waitFor(() => expect(votes()).toEqual([{ dilemmaId: 'influencers-vs-last-cat', choice: 'pull', voterId: VOTER }]))
+    first.unmount()
+
+    const { user } = await renderGame()
+    // A player who joins now has nothing to send again either.
+    await user.click(screen.getByRole('button', { name: /^Switch player/ }))
+    await user.click(screen.getByRole('button', { name: /New game/ }))
+    await user.click(screen.getByRole('button', { name: 'Start' }))
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    })
+    expect(votes()).toHaveLength(1)
+    expect(JSON.parse(localStorage.getItem(OUTBOX_KEY) ?? '{}')).toMatchObject({ resent: [VOTER, expect.any(String)] })
   })
 
   it('reopens a decided dilemma with its aftermath', async () => {

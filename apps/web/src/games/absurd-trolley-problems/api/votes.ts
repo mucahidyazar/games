@@ -5,8 +5,11 @@ import {
   type TrolleyVoteRequest,
   type TrolleyVoteResponse,
 } from '@games/contract'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import type { KeyValueStore } from '@/games/trap-the-orb/storage/keyValueStore'
 import { apiRequest } from '@/lib/api/client'
+import { createVoteSender, type Outbox, type Voter } from './voteOutbox'
 
 export const talliesKey = ['trolley', 'tallies'] as const
 
@@ -27,13 +30,37 @@ export function useTallies() {
   })
 }
 
-/** Sends a vote and folds the server's fresh tally into the cached ones. */
-export function useCastVote() {
+export interface VoteOutbox {
+  /** The votes still on their way. */
+  readonly outbox: Outbox
+  cast(vote: TrolleyVoteRequest): void
+  resend(voters: readonly Voter[]): void
+}
+
+/**
+ * The device's votes, sent until the server has each one (see voteOutbox.ts),
+ * with the server's fresh tally folded into the cached ones.
+ */
+export function useVoteOutbox(store: KeyValueStore | null): VoteOutbox {
   const client = useQueryClient()
-  return useMutation({
-    mutationFn: trolleyApi.vote,
-    onSuccess: ({ dilemmaId, tally }) => {
-      client.setQueryData<TrolleyTalliesResponse>(talliesKey, (current) => ({ tallies: { ...current?.tallies, [dilemmaId]: tally } }))
-    },
-  })
+  const [sender] = useState(() =>
+    createVoteSender({
+      store,
+      send: trolleyApi.vote,
+      onDelivered: ({ dilemmaId, tally }) => {
+        client.setQueryData<TrolleyTalliesResponse>(talliesKey, (current) => ({ tallies: { ...current?.tallies, [dilemmaId]: tally } }))
+      },
+    }),
+  )
+  useEffect(() => {
+    sender.start()
+    const online = (): void => sender.flush()
+    window.addEventListener('online', online)
+    return () => {
+      window.removeEventListener('online', online)
+      sender.stop()
+    }
+  }, [sender])
+  const outbox = useSyncExternalStore(sender.subscribe, sender.getSnapshot)
+  return useMemo(() => ({ outbox, cast: sender.cast, resend: sender.resend }), [outbox, sender])
 }

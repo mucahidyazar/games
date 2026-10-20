@@ -9,6 +9,8 @@ export interface FakeApiOptions {
   readonly isDown?: boolean
   /** Absurd Trolley Problems' community votes, by dilemma id. */
   readonly trolleyTallies?: Readonly<Record<string, TrolleyTally>>
+  /** How many votes the "proxy" in front of the API drops (502) before they get through. */
+  readonly droppedVotes?: number
 }
 
 const json = (body: unknown, status = 200): Response =>
@@ -23,8 +25,9 @@ function requestUrl(input: RequestInfo | URL): URL {
  * Stubs `fetch` with a tiny in-memory stand-in for the API, signed out. Returns
  * the mock so tests can inspect the requests.
  */
-export function installFakeApi({ auth = { google: true, email: true }, leaderboard, isDown = false, trolleyTallies = {} }: FakeApiOptions = {}) {
+export function installFakeApi({ auth = { google: true, email: true }, leaderboard, isDown = false, trolleyTallies = {}, droppedVotes = 0 }: FakeApiOptions = {}) {
   const tallies: Record<string, TrolleyTally> = { ...trolleyTallies }
+  let votesToDrop = droppedVotes
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     if (isDown) throw new TypeError('Failed to fetch')
     const url = requestUrl(input)
@@ -32,6 +35,10 @@ export function installFakeApi({ auth = { google: true, email: true }, leaderboa
       case '/api/trolley/tallies':
         return json({ tallies })
       case '/api/trolley/votes': {
+        if (votesToDrop > 0) {
+          votesToDrop -= 1
+          return new Response('Bad gateway', { status: 502 })
+        }
         const vote = JSON.parse(String(init?.body ?? '{}')) as { dilemmaId: string; choice: 'pull' | 'stay' }
         const tally = tallies[vote.dilemmaId] ?? { pull: 0, stay: 0 }
         tallies[vote.dilemmaId] = { ...tally, [vote.choice]: tally[vote.choice] + 1 }

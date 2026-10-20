@@ -7,7 +7,8 @@ import { createPortal } from 'react-dom'
 import { useLang } from '@/app/lang'
 import { getBrowserStore } from '@/games/trap-the-orb/storage/keyValueStore'
 import { usePrefersReducedMotion } from '@/lib/motion'
-import { useCastVote, useTallies } from '../api/votes'
+import { isAwaitingDelivery } from '../api/voteOutbox'
+import { useTallies, useVoteOutbox } from '../api/votes'
 import { createTrolleyAudio } from '../audio/trolleyAudio'
 import { CHAPTERS } from '../content/dilemmas'
 import { FOOT_DILEMMAS } from '../content/foot'
@@ -75,11 +76,16 @@ export function TrolleyGame({ headerSlot, isActive, isDialogOpen, soundEnabled, 
   const reducedMotion = usePrefersReducedMotion()
   const baseId = useId()
   const talliesQuery = useTallies()
-  const vote = useCastVote()
+  const votes = useVoteOutbox(store)
 
   useEffect(() => {
     savePlayers(store, players)
   }, [store, players])
+
+  // Votes that failed before the outbox were lost, so each player's saved answers are sent once more (a repeat
+  // counts once). A player who joins later is only noted: their votes all go through the outbox.
+  const { resend } = votes
+  useEffect(() => resend(players.list.map((each) => each.progress)), [resend, players.list])
 
   const player = activePlayer(players)
   // The game that is on, as progress; changes to it are changes to that player's game.
@@ -114,9 +120,10 @@ export function TrolleyGame({ headerSlot, isActive, isDialogOpen, soundEnabled, 
     if (!dilemma || !answer) return { tally: null, status }
     const id = dilemma.id as TrolleyVoteId
     const cached = tallies[id]
-    const ownVoteInFlight = vote.variables?.dilemmaId === id && (vote.isPending || vote.isError)
-    return { tally: ownVoteInFlight ? withOwnVote(cached, answer) : (cached ?? null), status }
-  }, [dilemma, answer, tallies, status, vote.variables, vote.isPending, vote.isError])
+    // Until the server has the player's vote, its tally is shown with that vote in it.
+    const ownVoteOnItsWay = isAwaitingDelivery(votes.outbox, progress.voterId, id)
+    return { tally: ownVoteOnItsWay ? withOwnVote(cached, answer) : (cached ?? null), status }
+  }, [dilemma, answer, tallies, status, votes.outbox, progress.voterId])
 
   const choose = (choice: TrolleyChoice): void => {
     if (!player || startOpen || !dilemma || answer || running || tab !== 'play') return
@@ -126,7 +133,7 @@ export function TrolleyGame({ headerSlot, isActive, isDialogOpen, soundEnabled, 
     setImpacts(0)
     setRunning(true)
     setProgress((current) => ({ ...current, answers: { ...current.answers, [id]: choice } }))
-    vote.mutate({ dilemmaId: id, choice, voterId: progress.voterId })
+    votes.cast({ dilemmaId: id, choice, voterId: progress.voterId })
     audio.duck(true)
     void (stageRef.current?.play(choice) ?? Promise.resolve()).then(() => {
       setRunning(false)

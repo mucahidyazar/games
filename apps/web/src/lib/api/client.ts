@@ -21,12 +21,15 @@ import {
 export class ApiError extends Error {
   readonly code: string
   readonly status: number
+  /** Seconds the server asked to wait before trying again (Retry-After), if it said. */
+  readonly retryAfter: number | null
 
-  constructor(code: string, message: string, status: number) {
+  constructor(code: string, message: string, status: number, retryAfter: number | null = null) {
     super(message)
     this.name = 'ApiError'
     this.code = code
     this.status = status
+    this.retryAfter = retryAfter
   }
 }
 
@@ -43,11 +46,17 @@ interface RequestOptions<T> {
   readonly keepalive?: boolean
 }
 
+/** Retry-After in seconds; the HTTP-date form is not used by the API. */
+function retryAfterOf(response: Response): number | null {
+  const seconds = Number(response.headers.get('Retry-After') ?? '')
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : null
+}
+
 async function readError(response: Response): Promise<ApiError> {
   const parsed = apiErrorSchema.safeParse(await response.json().catch(() => null))
   return parsed.success
-    ? new ApiError(parsed.data.error.code, parsed.data.error.message, response.status)
-    : new ApiError('http_error', `Request failed (${response.status})`, response.status)
+    ? new ApiError(parsed.data.error.code, parsed.data.error.message, response.status, retryAfterOf(response))
+    : new ApiError('http_error', `Request failed (${response.status})`, response.status, retryAfterOf(response))
 }
 
 /** Browsers cap keep-alive request bodies at 64 KB. */
