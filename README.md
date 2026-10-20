@@ -112,6 +112,8 @@ The site alone can still be hosted on a static host (`apps/web/vercel.json` and 
 
 Use the root Dockerfile, context `/`, exposed port `3102`, and `VITE_SITE=portal` / `VITE_SITE_URL=https://games.mucahid.dev`. Public `VITE_*` values must be available at **build time**; changing them needs a rebuild. Database/auth/email secrets belong only in runtime variables. Keep production login-code logging disabled.
 
+Connect the repository through a GitHub App source (**Private Repository (with GitHub App)**, which takes public repositories too), not as a public repository: only a GitHub App source hears about pushes, so only then does Auto Deploy deploy each push to `main`. With a public-repository source every deployment has to be started by hand.
+
 Set the runtime variable `TRUST_PROXY=1`: every request reaches the container from the tunnel connector, and Cloudflare passes the visitor's address in `X-Forwarded-For`. Left at `0`, all visitors share one rate-limit budget (60 trolley votes a minute between them, and the same goes for the leaderboards and sign-in), and the API logs a warning saying so. Route the hostname to the container's port directly, as below; with Coolify's proxy in between as well, there are two proxies (`TRUST_PROXY=2`).
 
 For a tunnel connector on the same server, map a free loopback port (for example `127.0.0.1:10105:3102`) and route `games.mucahid.dev` to `http://127.0.0.1:10105`. The public-hostname configuration creates tunnel DNS; avoid conflicting A records. Preserve the existing tunnel and its other applications. Postgres holds accounts and ranked runs, so maintain database backups independently.
